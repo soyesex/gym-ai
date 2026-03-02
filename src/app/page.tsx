@@ -1,65 +1,74 @@
-import Image from "next/image";
+/**
+ * @file app/page.tsx
+ * Home dashboard — Server Component.
+ *
+ * First-time detection:
+ *   If the user's profile has no `goal` set, it means onboarding was never completed.
+ *   In that case, we redirect to /onboarding BEFORE rendering anything.
+ *
+ * Data flow (returning users):
+ *   Parallel fetch → authUser + profile + weeklyStats + activeWorkout + AI modules
+ *   → Props passed to HomeClient (Client Component)
+ *
+ * The AI recommendation call (`getRecommendedModules`) runs alongside the other
+ * fetches so it doesn't add to the critical path. If the AI call fails for any
+ * reason, the Home page still renders with an empty modules array.
+ *
+ * Locale:
+ *   The user's preferred language is read from the `gym-ai-locale` cookie
+ *   (set by the client-side I18nProvider). This is passed to the RAG pipeline
+ *   so that module titles are generated in the correct language.
+ */
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { getAuthUser, getProfile, getWeeklyWorkoutStats, getWorkouts, isProfileComplete } from "@/lib/supabase/queries";
+import { getRecommendedModules } from "@/lib/ai/recommendations";
+import HomeClient from "@/components/home/HomeClient";
+import type { Locale } from "@/i18n";
 
-export default function Home() {
+export default async function HomePage() {
+  // Read locale from cookie (set by I18nProvider on the client)
+  const cookieStore = await cookies();
+  const locale = (cookieStore.get("gym-ai-locale")?.value ?? "en") as Locale;
+
+  // Fetch auth user + profile first to determine routing
+  const [authUser, profile] = await Promise.all([
+    getAuthUser(),
+    getProfile(),
+  ]);
+
+  // Guard: if somehow not authenticated, send to login
+  if (!authUser) {
+    redirect("/login");
+  }
+
+  // Onboarding guard: if critical profile fields are missing, redirect
+  // to the onboarding wizard BEFORE triggering any expensive data fetches.
+  if (!isProfileComplete(profile)) {
+    redirect("/onboarding");
+  }
+
+  // Returning user — fetch remaining data + AI recommendations in parallel.
+  // The AI call is wrapped in a catch so a Gemini failure never breaks the page.
+  const [weeklyStats, allWorkouts, recommendedModules] = await Promise.all([
+    getWeeklyWorkoutStats(),
+    getWorkouts(),
+    getRecommendedModules(authUser.id, locale).catch((err) => {
+      console.error("[HomePage] AI recommendations failed:", err);
+      return [];
+    }),
+  ]);
+
+  // Find any currently active session so the dashboard can show a "Resume" banner
+  const activeWorkout = allWorkouts.find((w) => w.status === "active") ?? null;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <HomeClient
+      authEmail={authUser.email ?? null}
+      profile={profile!}
+      weeklyStats={weeklyStats}
+      activeWorkout={activeWorkout}
+      recommendedModules={recommendedModules}
+    />
   );
 }
