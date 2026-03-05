@@ -132,7 +132,8 @@
         "enterSystem": "ENTER THE SYSTEM",
         "back": "Back",
         "next": "NEXT",
-        "step": "Step"
+        "step": "Step",
+        "days": "days"
     },
     "log": {
         "trainingLog": "Training Log",

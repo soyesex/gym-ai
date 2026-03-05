@@ -42,26 +42,27 @@ interface ProfileClientProps {
 
 // ── Static option data (mirrors OnboardingWizard) ─────────────────────────────
 
-const GOAL_OPTIONS: { value: NonNullable<Goal>; label: string; emoji: string }[] = [
-    { value: "lose_fat", label: "Lose Fat", emoji: "🔥" },
-    { value: "build_muscle", label: "Build Muscle", emoji: "💪" },
-    { value: "strength", label: "Strength", emoji: "⚡" },
-    { value: "health", label: "Stay Healthy", emoji: "🧬" },
-    { value: "performance", label: "Performance", emoji: "🚀" },
+/** i18n key used with t() to get the translated label */
+const GOAL_OPTIONS: { value: NonNullable<Goal>; i18nKey: string; emoji: string }[] = [
+    { value: "lose_fat", i18nKey: "goals.lose_fat", emoji: "🔥" },
+    { value: "build_muscle", i18nKey: "goals.build_muscle", emoji: "💪" },
+    { value: "strength", i18nKey: "goals.strength", emoji: "⚡" },
+    { value: "health", i18nKey: "goals.health", emoji: "🧬" },
+    { value: "performance", i18nKey: "goals.performance", emoji: "🚀" },
 ];
 
-const LEVEL_OPTIONS: { value: NonNullable<Level>; label: string; emoji: string }[] = [
-    { value: "sedentary", label: "Sedentary", emoji: "🛋️" },
-    { value: "beginner", label: "Beginner", emoji: "🌱" },
-    { value: "intermediate", label: "Intermediate", emoji: "⚙️" },
-    { value: "advanced", label: "Advanced", emoji: "🔩" },
-    { value: "elite", label: "Elite", emoji: "👑" },
+const LEVEL_OPTIONS: { value: NonNullable<Level>; i18nKey: string; emoji: string }[] = [
+    { value: "sedentary", i18nKey: "levels.sedentary", emoji: "🛋️" },
+    { value: "beginner", i18nKey: "levels.beginner", emoji: "🌱" },
+    { value: "intermediate", i18nKey: "levels.intermediate", emoji: "⚙️" },
+    { value: "advanced", i18nKey: "levels.advanced", emoji: "🔩" },
+    { value: "elite", i18nKey: "levels.elite", emoji: "👑" },
 ];
 
-const EQUIPMENT_OPTIONS: { value: NonNullable<Equipment>; label: string; emoji: string }[] = [
-    { value: "bodyweight", label: "No Equipment", emoji: "🏠" },
-    { value: "home_basic", label: "Home Gym", emoji: "🏋️" },
-    { value: "gym_full", label: "Full Gym", emoji: "🏟️" },
+const EQUIPMENT_OPTIONS: { value: NonNullable<Equipment>; i18nKey: string; emoji: string }[] = [
+    { value: "bodyweight", i18nKey: "equipment.bodyweight", emoji: "🏠" },
+    { value: "home_basic", i18nKey: "equipment.home_basic", emoji: "🏋️" },
+    { value: "gym_full", i18nKey: "equipment.gym_full", emoji: "🏟️" },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -84,13 +85,13 @@ function getInitials(name: string): string {
         : name.slice(0, 2).toUpperCase();
 }
 
-/** Looks up the human label for an enum value */
-function labelFor<T extends string>(
-    options: { value: T; label: string; emoji: string }[],
+/** Returns the i18n key for an enum value, to be passed to t() */
+function i18nKeyFor<T extends string>(
+    options: { value: T; i18nKey: string; emoji: string }[],
     value: T | null | undefined
 ): string {
-    if (!value) return "—";
-    return options.find((o) => o.value === value)?.label ?? value;
+    if (!value) return "";
+    return options.find((o) => o.value === value)?.i18nKey ?? value;
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────────
@@ -369,8 +370,8 @@ function GoalLevelSection({ profile }: { profile: Profile | null }) {
             label={t("profile.goalAndLevel")}
             summary={
                 <div className="flex gap-3">
-                    <Chip label={labelFor(GOAL_OPTIONS, goal)} color="#39ff14" />
-                    <Chip label={labelFor(LEVEL_OPTIONS, level)} color="#a855f7" />
+                    <Chip label={goal ? t(i18nKeyFor(GOAL_OPTIONS, goal)) : "—"} color="#39ff14" />
+                    <Chip label={level ? t(i18nKeyFor(LEVEL_OPTIONS, level)) : "—"} color="#a855f7" />
                 </div>
             }
             getPayload={() => ({ goal, level })}
@@ -384,7 +385,7 @@ function GoalLevelSection({ profile }: { profile: Profile | null }) {
                         <OptionPill
                             key={opt.value}
                             emoji={opt.emoji}
-                            label={opt.label}
+                            label={t(opt.i18nKey)}
                             selected={goal === opt.value}
                             onSelect={() => setGoal(opt.value)}
                         />
@@ -398,7 +399,7 @@ function GoalLevelSection({ profile }: { profile: Profile | null }) {
                         <OptionPill
                             key={opt.value}
                             emoji={opt.emoji}
-                            label={opt.label}
+                            label={t(opt.i18nKey)}
                             selected={level === opt.value}
                             onSelect={() => setLevel(opt.value)}
                         />
@@ -422,7 +423,7 @@ function EquipmentSection({ profile }: { profile: Profile | null }) {
         <EditableSection
             icon={<Dumbbell className="w-4 h-4" />}
             label={t("profile.equipment")}
-            summary={<Chip label={labelFor(EQUIPMENT_OPTIONS, equipment)} color="#00d4ff" />}
+            summary={<Chip label={equipment ? t(i18nKeyFor(EQUIPMENT_OPTIONS, equipment)) : "—"} color="#00d4ff" />}
             getPayload={() => ({ equipment })}
             hasChanges={hasChanges}
             onReset={() => setEquipment(origEquipment)}
@@ -432,7 +433,7 @@ function EquipmentSection({ profile }: { profile: Profile | null }) {
                     <OptionPill
                         key={opt.value}
                         emoji={opt.emoji}
-                        label={opt.label}
+                        label={t(opt.i18nKey)}
                         selected={equipment === opt.value}
                         onSelect={() => setEquipment(opt.value)}
                     />

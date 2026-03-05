@@ -656,21 +656,22 @@ function StepSchedule({
     onFinish: () => void; onBack: () => void;
     saving: boolean; error: string | null; canAdvance: boolean;
 }) {
+    const { t } = useTranslation();
     return (
         <div className="pt-4">
-            <p className="text-xs tracking-[0.3em] text-white/30 uppercase mb-2">Step 6</p>
+            <p className="text-xs tracking-[0.3em] text-white/30 uppercase mb-2">{t("onboarding.step")} 6</p>
             <h2 className="text-2xl font-bold text-white mb-1">
-                Training <span style={{ color: "#39ff14" }}>Schedule</span>
+                {t("onboarding.trainingSchedule").split(" ")[0]} <span style={{ color: "#39ff14" }}>{t("onboarding.trainingSchedule").split(" ").slice(1).join(" ")}</span>
             </h2>
-            <p className="text-sm text-white/40 mb-8">How often and how long can you train?</p>
+            <p className="text-sm text-white/40 mb-8">{t("onboarding.howOftenTrain")}</p>
 
             <div className="space-y-5 mb-8">
                 <SliderField
-                    label="Days per Week" value={days} unit="days"
+                    label={t("profile.daysPerWeek")} value={days} unit={t("onboarding.days")}
                     min={1} max={7} color="#a855f7" onChange={onDaysChange}
                 />
                 <SliderField
-                    label="Session Duration" value={minutes} unit="min"
+                    label={t("profile.sessionDuration")} value={minutes} unit="min"
                     min={15} max={120} step={5} color="#f97316" onChange={onMinutesChange}
                 />
             </div>
@@ -681,7 +682,7 @@ function StepSchedule({
                 </p>
             )}
 
-            <NextButton onClick={onFinish} loading={saving} disabled={!canAdvance} label="INITIALIZE PROTOCOL" />
+            <NextButton onClick={onFinish} loading={saving} disabled={!canAdvance} label={t("onboarding.initializeProtocol")} />
             <BackLink onClick={onBack} />
         </div>
     );
@@ -689,6 +690,7 @@ function StepSchedule({
 
 // ── Step 7: Complete ───────────────────────────────────────────────────────────
 function StepComplete({ name, onEnter }: { name: string; onEnter: () => void }) {
+    const { t } = useTranslation();
     return (
         <div className="pt-8 text-center">
             <motion.div
@@ -703,13 +705,13 @@ function StepComplete({ name, onEnter }: { name: string; onEnter: () => void }) 
 
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                 <h2 className="text-3xl font-bold text-white mb-2">
-                    Protocol <span style={{ color: "#39ff14" }}>Active.</span>
+                    {t("onboarding.protocolActive").split(" ")[0]} <span style={{ color: "#39ff14" }}>{t("onboarding.protocolActive").split(" ").slice(1).join(" ")}</span>
                 </h2>
                 <p className="text-sm text-white/50 mb-2">
-                    Welcome to the system{name ? `, ${name}` : ""}.
+                    {t("onboarding.welcomeSystem")}{name ? `, ${name}` : ""}.
                 </p>
-                <p className="text-xs text-white/30 mb-10">Your training AI is calibrated and ready.</p>
-                <NextButton onClick={onEnter} label="ENTER THE SYSTEM" />
+                <p className="text-xs text-white/30 mb-10">{t("onboarding.aiCalibrated")}</p>
+                <NextButton onClick={onEnter} label={t("onboarding.enterSystem")} />
             </motion.div>
         </div>
     );

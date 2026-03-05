@@ -132,7 +132,8 @@
         "enterSystem": "ENTRAR AL SISTEMA",
         "back": "Atrás",
         "next": "SIGUIENTE",
-        "step": "Paso"
+        "step": "Paso",
+        "days": "días"
     },
     "log": {
         "trainingLog": "Registro de Entrenamiento",

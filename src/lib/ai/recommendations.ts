@@ -401,8 +401,8 @@ export async function getRecommendedModules(
         // Step 1: Check the cache — valid for 7 days to save API tokens
         // ══════════════════════════════════════════════════════════════════
 
-        /** How many days a cached recommendation set stays fresh */
-        const CACHE_TTL_DAYS = 7;
+        /** How many days a cached recommendation set stays fresh (≈2 months to conserve API credits) */
+        const CACHE_TTL_DAYS = 60;
 
         try {
             // Fetch the most recent recommendation for this user,
