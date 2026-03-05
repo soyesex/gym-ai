@@ -160,4 +160,4 @@ gym-ai/
 
 ## 📄 License
 
-MIT © [Your Name](https://github.com/YOUR_USERNAME)
+MIT © [Your Name](https://github.com/soyesex)
