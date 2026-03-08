@@ -1025,9 +1025,532 @@ VALUES
   'Empieza con mancuernas a la altura de los hombros, baja en sentadilla a paralelo y al subir usa el impulso para empujar ambas mancuernas sobre la cabeza en un movimiento fluido.',
   'intermediate', 'dumbbell', 'push', 'compound', 'quads',
   ARRAY['glutes','shoulders','triceps']::muscle_group[]
+),
+
+-- =============================================================================
+-- CHEST — ADDITIONAL
+-- =============================================================================
+
+(
+  'Decline Push-Up',
+  'Flexión Declinada',
+  'Place feet on an elevated surface and hands on the floor, perform a push-up in this declined position to emphasize the upper chest.',
+  'Coloca los pies en una superficie elevada y las manos en el piso, realiza una flexión en esta posición declinada para enfatizar el pecho superior.',
+  'intermediate', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['shoulders','triceps']::muscle_group[]
+),
+(
+  'Incline Push-Up',
+  'Flexión Inclinada',
+  'Place hands on an elevated surface and feet on the floor, perform a push-up to target the lower chest with reduced bodyweight resistance.',
+  'Coloca las manos en una superficie elevada y los pies en el piso, realiza una flexión para trabajar el pecho inferior con menor resistencia corporal.',
+  'beginner', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['triceps']::muscle_group[]
+),
+(
+  'Low Cable Fly',
+  'Apertura en Cable Bajo',
+  'Stand between two low cable pulleys, grip the handles and raise both arms upward in a wide arc to meet at chest height, squeezing the pecs.',
+  'Párate entre dos poleas bajas, agarra los agarres y eleva ambos brazos en arco amplio hasta encontrarse a la altura del pecho, apretando los pectorales.',
+  'intermediate', 'cable', 'push', 'isolation', 'chest',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Archer Push-Up',
+  'Flexión Arquero',
+  'Start wide with one arm, shift the body laterally toward one arm while the other extends straight, performing a single-arm push-up pattern.',
+  'Empieza con las manos separadas, desplaza el cuerpo lateralmente hacia un brazo mientras el otro se extiende recto, realizando un patrón de flexión unilateral.',
+  'advanced', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['triceps','shoulders']::muscle_group[]
+),
+(
+  'One-Arm Push-Up',
+  'Flexión con Un Brazo',
+  'Place one hand behind the back and perform a push-up on the other arm, keeping the body square and the core braced throughout.',
+  'Coloca una mano detrás de la espalda y realiza una flexión con el otro brazo, manteniendo el cuerpo cuadrado y el core tenso durante todo el movimiento.',
+  'advanced', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['triceps','shoulders']::muscle_group[]
+),
+
+-- =============================================================================
+-- BACK — ADDITIONAL LATS
+-- =============================================================================
+
+(
+  'Neutral-Grip Pull-Up',
+  'Dominada con Agarre Neutro',
+  'Hang from parallel handles with a neutral (palms-facing) grip and pull the chin above the level of the hands, emphasizing the lower lats and biceps.',
+  'Cuélgate de manijas paralelas con agarre neutro (palmas enfrentadas) y sube el mentón por encima del nivel de las manos, enfatizando los dorsales inferiores y bíceps.',
+  'intermediate', 'bodyweight', 'pull', 'compound', 'lats',
+  ARRAY['biceps']::muscle_group[]
+),
+(
+  'Single-Arm Lat Pulldown',
+  'Jalón Unilateral al Pecho',
+  'Attach a single handle to a high cable, sit sideways and pull the handle down to shoulder height with one arm, keeping the torso slightly inclined.',
+  'Acopla un agarre individual a una polea alta, siéntate de lado y jala el agarre hacia la altura del hombro con un brazo, manteniendo el torso ligeramente inclinado.',
+  'intermediate', 'cable', 'pull', 'isolation', 'lats',
+  ARRAY['biceps']::muscle_group[]
+),
+(
+  'Straight-Arm Pulldown',
+  'Jalón con Brazos Rectos',
+  'Stand at a high cable with a bar or rope, keep the arms straight, and pull the attachment down to the thighs in an arc, isolating the lats.',
+  'Párate en una polea alta con barra o cuerda, mantén los brazos rectos y jala el accesorio hacia los muslos en arco, aislando los dorsales.',
+  'beginner', 'cable', 'pull', 'isolation', 'lats',
+  ARRAY['triceps']::muscle_group[]
+),
+
+-- =============================================================================
+-- BACK — TRAPS ADDITIONAL
+-- =============================================================================
+
+(
+  'Dumbbell Upright Row',
+  'Remo al Mentón con Mancuernas',
+  'Hold dumbbells in front of the thighs and pull them straight up to chin level while flaring the elbows outward.',
+  'Sostén mancuernas frente a los muslos y jálalas hacia el mentón abriendo los codos hacia afuera.',
+  'beginner', 'dumbbell', 'pull', 'compound', 'traps',
+  ARRAY['shoulders']::muscle_group[]
+),
+(
+  'Rack Pull',
+  'Jalón desde Rack',
+  'Set the barbell pins at knee height inside a power rack, grip the bar and perform a partial deadlift from that height, focusing on the upper back and traps.',
+  'Ajusta los pines de la barra a la altura de las rodillas dentro de un rack de potencia, agarra la barra y realiza un peso muerto parcial desde esa altura, enfocando la espalda alta y los trapecios.',
+  'intermediate', 'barbell', 'pull', 'compound', 'traps',
+  ARRAY['lower_back','forearms']::muscle_group[]
+),
+(
+  'Band Face Pull',
+  'Jalón Facial con Banda',
+  'Anchor a resistance band at face height, grip the ends with both hands and pull toward the face while externally rotating the shoulders.',
+  'Ancla una banda de resistencia a la altura del rostro, agarra los extremos con ambas manos y jala hacia la cara mientras rotas externamente los hombros.',
+  'beginner', 'band', 'pull', 'isolation', 'traps',
+  ARRAY['shoulders']::muscle_group[]
+),
+
+-- =============================================================================
+-- SHOULDERS — ADDITIONAL
+-- =============================================================================
+
+(
+  'Machine Shoulder Press',
+  'Press de Hombros en Máquina',
+  'Sit at the shoulder press machine, grip the handles at shoulder height, and press upward to full elbow extension.',
+  'Siéntate en la máquina de press de hombros, agarra los manubrios a la altura de los hombros y empuja hacia arriba hasta extensión completa del codo.',
+  'beginner', 'machine', 'push', 'compound', 'shoulders',
+  ARRAY['triceps']::muscle_group[]
+),
+(
+  'Band Overhead Press',
+  'Press sobre la Cabeza con Banda',
+  'Stand on the middle of a resistance band, grip the ends at shoulder height, and press both hands overhead to full extension.',
+  'Párate sobre el centro de una banda de resistencia, agarra los extremos a la altura de los hombros y empuja ambas manos sobre la cabeza hasta extensión completa.',
+  'beginner', 'band', 'push', 'compound', 'shoulders',
+  ARRAY['triceps']::muscle_group[]
+),
+(
+  'Band Lateral Raise',
+  'Elevación Lateral con Banda',
+  'Stand on a resistance band with feet shoulder-width, grip the ends at your sides, and raise both arms laterally to shoulder height.',
+  'Párate sobre una banda de resistencia con pies al ancho de los hombros, agarra los extremos a los costados y eleva ambos brazos lateralmente a la altura de los hombros.',
+  'beginner', 'band', 'push', 'isolation', 'shoulders',
+  ARRAY[]::muscle_group[]
+),
+
+-- =============================================================================
+-- TRICEPS — ADDITIONAL
+-- =============================================================================
+
+(
+  'Cable Overhead Tricep Extension',
+  'Extensión de Tríceps sobre la Cabeza en Cable',
+  'Face away from a high cable with a rope attachment held behind the head, extend both arms forward and upward to full lockout.',
+  'Da la espalda a una polea alta con cuerda detrás de la cabeza, extiende ambos brazos hacia adelante y arriba hasta bloqueo completo.',
+  'beginner', 'cable', 'push', 'isolation', 'triceps',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Band Tricep Pushdown',
+  'Extensión de Tríceps con Banda',
+  'Anchor a resistance band overhead, face it, pin the elbows to the sides, and extend the forearms downward against the band tension.',
+  'Ancla una banda de resistencia sobre la cabeza, mírala de frente, fija los codos a los costados y extiende los antebrazos hacia abajo contra la tensión de la banda.',
+  'beginner', 'band', 'push', 'isolation', 'triceps',
+  ARRAY[]::muscle_group[]
+),
+
+-- =============================================================================
+-- BICEPS — ADDITIONAL
+-- =============================================================================
+
+(
+  'EZ-Bar Curl',
+  'Curl con Barra EZ',
+  'Hold an EZ-bar with a semi-supinated grip at hip level and curl to shoulder height, reducing wrist strain compared to a straight bar.',
+  'Sostén la barra EZ con agarre semi-supino a la altura de las caderas y lleva a la altura de los hombros, reduciendo la tensión en las muñecas frente a una barra recta.',
+  'beginner', 'ez_bar', 'pull', 'isolation', 'biceps',
+  ARRAY['forearms']::muscle_group[]
+),
+(
+  'Spider Curl',
+  'Curl Araña',
+  'Lie face-down on an incline bench angled at 45 degrees, let the arms hang perpendicular to the floor, and curl both dumbbells to peak contraction.',
+  'Recuéstate boca abajo en un banco inclinado a 45 grados, deja los brazos perpendiculares al piso y lleva ambas mancuernas hasta la contracción máxima.',
+  'intermediate', 'dumbbell', 'pull', 'isolation', 'biceps',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Cable Hammer Curl',
+  'Curl Martillo en Cable',
+  'Attach a rope to a low cable, grip with a neutral hold, and curl to shoulder height keeping the wrists neutral throughout.',
+  'Acopla una cuerda a una polea baja, agarra con agarre neutro y lleva a la altura de los hombros manteniendo las muñecas neutras durante el movimiento.',
+  'beginner', 'cable', 'pull', 'isolation', 'biceps',
+  ARRAY['forearms']::muscle_group[]
+),
+
+-- =============================================================================
+-- FOREARMS — ADDITIONAL
+-- =============================================================================
+
+(
+  'Dead Hang',
+  'Colgado Estático',
+  'Hang from a pull-up bar with a shoulder-width overhand grip for as long as possible, letting the shoulders decompress and developing grip endurance.',
+  'Cuélgate de una barra con agarre prono al ancho de los hombros durante el mayor tiempo posible, permitiendo la descompresión de los hombros y desarrollando la resistencia de agarre.',
+  'beginner', 'bodyweight', 'static', 'isolation', 'forearms',
+  ARRAY['lats','shoulders']::muscle_group[]
+),
+(
+  'Reverse Curl',
+  'Curl Invertido',
+  'Hold a barbell with an overhand grip and curl it to shoulder height, targeting the brachioradialis and forearm extensors.',
+  'Sostén la barra con agarre prono y lleva a la altura de los hombros, trabajando el braquiorradial y extensores del antebrazo.',
+  'beginner', 'barbell', 'pull', 'isolation', 'forearms',
+  ARRAY['biceps']::muscle_group[]
+),
+(
+  'EZ-Bar Reverse Curl',
+  'Curl Invertido con Barra EZ',
+  'Hold an EZ-bar with a pronated grip and curl to shoulder height, reducing wrist strain while targeting the forearm extensors and brachioradialis.',
+  'Sostén la barra EZ con agarre prono y lleva a la altura de los hombros, reduciendo tensión en muñecas mientras trabajas extensores del antebrazo y braquiorradial.',
+  'beginner', 'ez_bar', 'pull', 'isolation', 'forearms',
+  ARRAY['biceps']::muscle_group[]
+),
+
+-- =============================================================================
+-- HAMSTRINGS — ADDITIONAL
+-- =============================================================================
+
+(
+  'Dumbbell Romanian Deadlift',
+  'Peso Muerto Rumano con Mancuernas',
+  'Hold dumbbells in front of the thighs, hinge at the hips while maintaining a neutral spine, lower the dumbbells along the legs, then drive the hips to return.',
+  'Sostén mancuernas frente a los muslos, bisagra las caderas manteniendo columna neutra, baja las mancuernas por las piernas y empuja las caderas para volver.',
+  'beginner', 'dumbbell', 'hinge', 'compound', 'hamstrings',
+  ARRAY['glutes','lower_back']::muscle_group[]
+),
+(
+  'Stiff-Leg Deadlift',
+  'Peso Muerto con Piernas Rígidas',
+  'Hold a barbell with arms straight, hinge deeply at the hips keeping minimal knee bend, lower the bar toward the shins and return by contracting the hamstrings.',
+  'Sostén la barra con brazos rectos, bisagra profundamente en las caderas con mínima flexión de rodilla, baja la barra hacia las espinillas y regresa contrayendo los isquiotibiales.',
+  'intermediate', 'barbell', 'hinge', 'isolation', 'hamstrings',
+  ARRAY['glutes','lower_back']::muscle_group[]
+),
+(
+  'Cable Leg Curl',
+  'Curl de Isquiotibiales en Cable',
+  'Attach an ankle cuff to a low cable, face the machine, flex the knee to bring the heel toward the glute, then lower under control.',
+  'Acopla una tobillera a una polea baja, mira hacia la máquina, flexiona la rodilla llevando el talón hacia el glúteo y baja con control.',
+  'beginner', 'cable', 'hinge', 'isolation', 'hamstrings',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Resistance Band Leg Curl',
+  'Curl de Isquiotibiales con Banda',
+  'Anchor a band at ankle height, attach it to the ankle, lie face down and curl the heel toward the glutes against the band resistance.',
+  'Ancla una banda a la altura del tobillo, acopla al tobillo, recuéstate boca abajo y lleva el talón hacia los glúteos contra la resistencia de la banda.',
+  'beginner', 'band', 'hinge', 'isolation', 'hamstrings',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Glute-Ham Raise',
+  'Elevación Glúteos-Isquiotibiales',
+  'Lock the feet into a glute-ham developer, lower the torso forward with a slight knee bend, then use the hamstrings to pull the body back upright.',
+  'Fija los pies en el banco de glúteos-isquiotibiales, baja el torso hacia adelante con leve flexión de rodilla y usa los isquiotibiales para jalar el cuerpo de vuelta.',
+  'advanced', 'bodyweight', 'hinge', 'compound', 'hamstrings',
+  ARRAY['glutes','calves']::muscle_group[]
+),
+
+-- =============================================================================
+-- GLUTES — ADDITIONAL
+-- =============================================================================
+
+(
+  'Donkey Kick',
+  'Patada de Burro',
+  'Start on all fours, keep the knee bent at 90 degrees, and drive one heel upward toward the ceiling by contracting the glute.',
+  'Empieza en cuadrupedia, mantén la rodilla a 90 grados y empuja un talón hacia el techo contrayendo el glúteo.',
+  'beginner', 'bodyweight', 'push', 'isolation', 'glutes',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Fire Hydrant',
+  'Hidrante de Fuego',
+  'Start on all fours and raise one knee out to the side to hip height while keeping the knee bent, squeezing the glute at the top.',
+  'Empieza en cuadrupedia y eleva una rodilla hacia el costado a la altura de la cadera manteniendo la rodilla flexionada, apretando el glúteo arriba.',
+  'beginner', 'bodyweight', 'push', 'isolation', 'glutes',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Cable Kickback',
+  'Patada en Cable',
+  'Attach an ankle cuff to a low cable, face the machine, and drive the leg straight back until the glute is fully contracted, then return under control.',
+  'Acopla una tobillera a una polea baja, mira hacia la máquina y empuja la pierna hacia atrás hasta contracción completa del glúteo, luego regresa con control.',
+  'beginner', 'cable', 'push', 'isolation', 'glutes',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Banded Hip Thrust',
+  'Empuje de Cadera con Banda',
+  'Place a resistance band across the hips with upper back against a bench, perform a hip thrust against the extra band resistance for increased glute tension.',
+  'Coloca una banda de resistencia en las caderas con la espalda alta apoyada en un banco, realiza un empuje de cadera contra la resistencia adicional de la banda para mayor tensión de glúteo.',
+  'intermediate', 'band', 'hinge', 'isolation', 'glutes',
+  ARRAY['hamstrings']::muscle_group[]
+),
+
+-- =============================================================================
+-- CALVES — ADDITIONAL
+-- =============================================================================
+
+(
+  'Donkey Calf Raise',
+  'Elevación de Talones Burro',
+  'Bend forward at the hips with upper body supported, place toes on a raised platform, and perform full range-of-motion calf raises to maximize gastrocnemius stretch.',
+  'Inclínate hacia adelante en las caderas con el torso apoyado, coloca los pies en una plataforma elevada y realiza elevaciones de talón con rango completo para maximizar el estiramiento del gastrocnemio.',
+  'intermediate', 'bodyweight', 'push', 'isolation', 'calves',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Leg Press Calf Raise',
+  'Elevación de Talones en Prensa',
+  'Sit in the leg press machine, place just the forefoot on the lower edge of the platform, and perform calf raises through a full range of motion.',
+  'Siéntate en la máquina de prensa, coloca solo el antepié en el borde inferior de la plataforma y realiza elevaciones de talón con rango completo.',
+  'beginner', 'machine', 'push', 'isolation', 'calves',
+  ARRAY[]::muscle_group[]
+),
+
+-- =============================================================================
+-- ABS — ADDITIONAL
+-- =============================================================================
+
+(
+  'V-Up',
+  'V-Up',
+  'Lie flat on your back, simultaneously raise both legs and your upper body to meet in the middle, forming a V shape, then lower under control.',
+  'Recuéstate completamente, eleva simultáneamente ambas piernas y el torso para encontrarse en el centro formando una V, luego baja con control.',
+  'intermediate', 'bodyweight', 'push', 'compound', 'abs',
+  ARRAY['quads']::muscle_group[]
+),
+(
+  'Hollow Body Hold',
+  'Posición Hueca',
+  'Lie on your back, press the lower back firmly into the floor, raise the legs and shoulders slightly off the ground, and hold the position with arms extended overhead.',
+  'Recuéstate boca arriba, presiona la zona lumbar firmemente en el piso, eleva las piernas y los hombros ligeramente del suelo y mantén la posición con los brazos extendidos sobre la cabeza.',
+  'intermediate', 'bodyweight', 'static', 'isolation', 'abs',
+  ARRAY['lower_back']::muscle_group[]
+),
+(
+  'Flutter Kicks',
+  'Patadas de Mariposa',
+  'Lie on your back with legs raised slightly off the floor and alternate rapid up-and-down kicks while keeping the lower back pressed down.',
+  'Recuéstate boca arriba con las piernas elevadas ligeramente del suelo y alterna patadas rápidas arriba y abajo manteniendo la zona lumbar presionada.',
+  'beginner', 'bodyweight', 'static', 'isolation', 'abs',
+  ARRAY['quads']::muscle_group[]
+),
+(
+  'Toe Touch',
+  'Toque de Punta',
+  'Lie on your back with legs extended toward the ceiling, reach both hands up toward the feet, lifting the shoulder blades off the floor.',
+  'Recuéstate boca arriba con las piernas extendidas hacia el techo, alcanza ambas manos hacia los pies despegando los omóplatos del piso.',
+  'beginner', 'bodyweight', 'push', 'isolation', 'abs',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Hanging Windshield Wiper',
+  'Limpiaparabrisas Colgado',
+  'Hang from a pull-up bar, raise the legs to 90 degrees, then rotate them side to side like windshield wipers while keeping the hips controlled.',
+  'Cuélgate de una barra, sube las piernas a 90 grados y rotalas de lado a lado como limpiaparabrisas manteniendo las caderas controladas.',
+  'advanced', 'bodyweight', 'static', 'compound', 'abs',
+  ARRAY['obliques','lats']::muscle_group[]
+),
+(
+  'Weighted Plank',
+  'Plancha con Peso',
+  'Assume a standard forearm plank and have a partner place a weight plate on the upper back, then hold the plank position for time.',
+  'Adopta la posición de plancha en antebrazos y pide a un compañero que coloque un disco de peso en la parte alta de la espalda, luego mantén la plancha por tiempo.',
+  'intermediate', 'bodyweight', 'static', 'isolation', 'abs',
+  ARRAY['lower_back','shoulders']::muscle_group[]
+),
+
+-- =============================================================================
+-- OBLIQUES — ADDITIONAL
+-- =============================================================================
+
+(
+  'Pallof Press',
+  'Press Pallof',
+  'Stand sideways to a cable set at chest height, hold the handle with both hands at the sternum, and press straight out and return while resisting rotation.',
+  'Párate de lado a un cable a la altura del pecho, sostén el agarre con ambas manos en el esternón, empuja recto hacia afuera y regresa resistiendo la rotación.',
+  'beginner', 'cable', 'static', 'isolation', 'obliques',
+  ARRAY['abs']::muscle_group[]
+),
+(
+  'Dumbbell Side Bend',
+  'Flexión Lateral con Mancuerna',
+  'Hold a dumbbell in one hand at your side, laterally flex the spine away from the weight and return under control, focusing on the oblique.',
+  'Sostén una mancuerna en una mano a un costado, flexiona lateralmente la columna alejándote del peso y regresa con control, enfocando el oblicuo.',
+  'beginner', 'dumbbell', 'pull', 'isolation', 'obliques',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Cable Woodchop',
+  'Corte de Leña en Cable',
+  'Stand sideways to a high cable, grip the handle with both hands, and pull it diagonally across the body from high to low in a chopping pattern.',
+  'Párate de lado a un cable alto, agarra el manubrio con ambas manos y jálalo diagonalmente a través del cuerpo de arriba a abajo en patrón de corte.',
+  'intermediate', 'cable', 'pull', 'compound', 'obliques',
+  ARRAY['abs','shoulders']::muscle_group[]
+),
+(
+  'Landmine Twist',
+  'Giro con Barra Anclada',
+  'Anchor a barbell in a landmine base, hold the free end with both hands at chest height, and rotate side to side while keeping the arms extended.',
+  'Ancla una barra en la base landmine, sostén el extremo libre con ambas manos a la altura del pecho y rota de lado a lado manteniendo los brazos extendidos.',
+  'intermediate', 'barbell', 'push', 'compound', 'obliques',
+  ARRAY['abs','shoulders']::muscle_group[]
+),
+(
+  'Kettlebell Windmill',
+  'Molino de Viento con Pesa Rusa',
+  'Press a kettlebell overhead with one arm, push the hips out to the opposite side, and hinge to lower the free hand toward the floor while keeping the bell locked out.',
+  'Presiona una pesa rusa sobre la cabeza con un brazo, empuja las caderas hacia el lado contrario y bisagra para bajar la mano libre hacia el piso manteniendo la pesa bloqueada.',
+  'advanced', 'kettlebell', 'push', 'compound', 'obliques',
+  ARRAY['shoulders','lower_back','hamstrings']::muscle_group[]
+),
+
+-- =============================================================================
+-- CALISTHENICS ADVANCED — ADDITIONAL
+-- =============================================================================
+
+(
+  'Front Lever',
+  'Front Lever',
+  'Hang from a bar or rings and raise the body to a horizontal position face-up, keeping the arms straight and the body rigid.',
+  'Cuélgate de una barra o argollas y eleva el cuerpo a posición horizontal mirando hacia arriba, manteniendo los brazos rectos y el cuerpo rígido.',
+  'advanced', 'bodyweight', 'static', 'compound', 'lats',
+  ARRAY['abs','lower_back']::muscle_group[]
+),
+(
+  'Planche Push-Up',
+  'Flexión en Plancha',
+  'Lean into a planche position with the body horizontal, arms straight, then perform a push-up by bending the elbows and pressing back out.',
+  'Inclínate hacia la posición de plancha con el cuerpo horizontal y brazos rectos, luego realiza una flexión flexionando los codos y empujando de regreso.',
+  'advanced', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['shoulders','triceps','abs']::muscle_group[]
+),
+(
+  'Ring Dip',
+  'Fondos en Argollas',
+  'Support on gymnastic rings, lower the body by bending the elbows while stabilizing the rings, then press back to lockout.',
+  'Apóyate en argollas de gimnasia, baja el cuerpo flexionando los codos mientras estabilizas las argollas, luego empuja de regreso hasta bloqueo.',
+  'advanced', 'bodyweight', 'push', 'compound', 'chest',
+  ARRAY['triceps','shoulders']::muscle_group[]
+),
+(
+  'Back Lever',
+  'Back Lever',
+  'Hang from a bar or rings and rotate the body backward to a horizontal position face-down, keeping the arms straight and body fully extended.',
+  'Cuélgate de una barra o argollas y rota el cuerpo hacia atrás a posición horizontal mirando hacia abajo, manteniendo los brazos rectos y el cuerpo extendido.',
+  'advanced', 'bodyweight', 'static', 'compound', 'lats',
+  ARRAY['abs','shoulders']::muscle_group[]
+),
+
+-- =============================================================================
+-- CARDIO — ADDITIONAL
+-- =============================================================================
+
+(
+  'Squat Jump',
+  'Salto desde Sentadilla',
+  'Descend into a full squat and explosively jump as high as possible, landing softly and immediately transitioning into the next rep.',
+  'Baja a sentadilla completa y salta explosivamente lo más alto posible, aterriza suavemente y transiciona de inmediato a la siguiente repetición.',
+  'intermediate', 'bodyweight', 'push', 'compound', 'cardio_system',
+  ARRAY['quads','glutes']::muscle_group[]
+),
+(
+  'Bear Crawl',
+  'Rastreo del Oso',
+  'Start on hands and feet with knees hovering an inch off the floor, crawl forward alternating opposite hand and foot while keeping the back flat.',
+  'Empieza en manos y pies con rodillas a centímetros del suelo, desplázate hacia adelante alternando mano y pie opuestos manteniendo la espalda plana.',
+  'beginner', 'bodyweight', 'push', 'compound', 'cardio_system',
+  ARRAY['shoulders','abs','quads']::muscle_group[]
+),
+(
+  'Skater Jump',
+  'Salto del Patinador',
+  'Leap laterally from one foot, landing on the opposite foot with a slight hinge forward, and immediately push off to the other side in a speed-skating motion.',
+  'Salta lateralmente desde un pie, aterriza en el pie opuesto con leve bisagra hacia adelante e inmediatamente empuja hacia el otro lado en movimiento de patinaje de velocidad.',
+  'intermediate', 'bodyweight', 'push', 'compound', 'cardio_system',
+  ARRAY['glutes','quads','calves']::muscle_group[]
+),
+(
+  'Rowing Machine',
+  'Máquina de Remo',
+  'Sit at the rowing ergometer, drive with the legs first, then lean back and pull the handle to the lower chest in one fluid stroke, then reverse.',
+  'Siéntate en el ergómetro de remo, impulsa primero con las piernas, luego inclínate hacia atrás y jala el manubrio al pecho inferior en una remada fluida, luego invierte.',
+  'beginner', 'machine', 'pull', 'compound', 'cardio_system',
+  ARRAY['lats','biceps','quads','hamstrings']::muscle_group[]
+),
+(
+  'Sprint Intervals',
+  'Intervalos de Sprint',
+  'Run at maximum velocity for a short distance or time, rest briefly, and repeat; develop explosive power and cardiovascular capacity simultaneously.',
+  'Corre a velocidad máxima durante una distancia o tiempo corto, descansa brevemente y repite; desarrolla potencia explosiva y capacidad cardiovascular simultáneamente.',
+  'intermediate', 'bodyweight', 'push', 'compound', 'cardio_system',
+  ARRAY['quads','hamstrings','glutes','calves']::muscle_group[]
+),
+
+-- =============================================================================
+-- BAND — ADDITIONAL
+-- =============================================================================
+
+(
+  'Band Good Morning',
+  'Buenos Días con Banda',
+  'Stand on a resistance band with it looped over the upper back, hinge at the hips to bring the torso parallel to the floor, then return.',
+  'Párate sobre una banda de resistencia con ella cruzada sobre la espalda alta, bisagra en las caderas para llevar el torso paralelo al piso, luego regresa.',
+  'beginner', 'band', 'hinge', 'compound', 'lower_back',
+  ARRAY['hamstrings','glutes']::muscle_group[]
+),
+(
+  'Band Glute Kickback',
+  'Patada de Glúteo con Banda',
+  'Attach a band to the ankle and anchor at a low point, stand facing the anchor, and drive the leg back and up in a controlled arc contracting the glute.',
+  'Acopla una banda al tobillo y ancla en punto bajo, párate mirando el ancla y empuja la pierna hacia atrás y arriba en arco controlado contrayendo el glúteo.',
+  'beginner', 'band', 'push', 'isolation', 'glutes',
+  ARRAY[]::muscle_group[]
+),
+(
+  'Band Hip Thrust',
+  'Empuje de Cadera con Banda Corta',
+  'Lie on your back with a mini band above the knees, feet hip-width, drive the hips up while pushing the knees out against the band.',
+  'Recuéstate boca arriba con una mini banda sobre las rodillas, pies al ancho de caderas, eleva las caderas mientras empujas las rodillas hacia afuera contra la banda.',
+  'beginner', 'band', 'hinge', 'isolation', 'glutes',
+  ARRAY['hamstrings']::muscle_group[]
 )
 
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- =============================================================================
 -- VERIFICATION QUERY — run after insert to confirm row count

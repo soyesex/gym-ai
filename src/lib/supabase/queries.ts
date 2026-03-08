@@ -27,6 +27,31 @@ export async function getAuthUser(): Promise<User | null> {
     return user;
 }
 
+// ── Exercise Categories ───────────────────────────────────────────────────────
+
+/**
+ * Fetches all exercise categories ordered by `sort_order`.
+ *
+ * Categories are static catalog data with RLS set to public read,
+ * so no authentication is required. Returns an empty array on error
+ * so the UI can fall back gracefully.
+ */
+export async function getExerciseCategories(): Promise<Tables<"exercise_categories">[]> {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("exercise_categories")
+        .select("*")
+        .order("sort_order", { ascending: true });
+
+    if (error) {
+        console.error("[getExerciseCategories] Supabase error:", error.message);
+        return [];
+    }
+
+    return data ?? [];
+}
+
 // ── Exercises ─────────────────────────────────────────────────────────────────
 
 /** Fetches all exercises from the public library (no auth required). */

@@ -10,7 +10,12 @@
  *   `ExerciseLibrary` client component which handles search and filtering.
  */
 import { redirect } from "next/navigation";
-import { getExercises, getProfile, isProfileComplete } from "@/lib/supabase/queries";
+import {
+    getExercises,
+    getExerciseCategories,
+    getProfile,
+    isProfileComplete,
+} from "@/lib/supabase/queries";
 import ExerciseLibrary from "@/components/home/ExerciseLibrary";
 import BottomNav from "@/components/home/BottomNav";
 
@@ -21,14 +26,18 @@ export default async function ExerciseLibraryPage() {
         redirect("/onboarding");
     }
 
-    const exercises = await getExercises();
+    // Fetch exercises and categories in parallel — they are independent queries
+    const [exercises, categories] = await Promise.all([
+        getExercises(),
+        getExerciseCategories(),
+    ]);
 
     return (
         <main
             className="min-h-screen pb-24"
             style={{ background: "#000", maxWidth: "480px", margin: "0 auto" }}
         >
-            <ExerciseLibrary exercises={exercises} />
+            <ExerciseLibrary exercises={exercises} categories={categories} />
             <BottomNav />
         </main>
     );

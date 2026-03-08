@@ -9,6 +9,35 @@ export type Json =
 export type Database = {
     public: {
         Tables: {
+            exercise_categories: {
+                Row: {
+                    id: string
+                    name_en: string
+                    name_es: string
+                    sort_order: number
+                    /** 'all' | 'force' | 'primary_muscle' */
+                    filter_field: string
+                    /** DB enum values that qualify an exercise for this category */
+                    filter_values: string[]
+                }
+                Insert: {
+                    id: string
+                    name_en: string
+                    name_es: string
+                    sort_order?: number
+                    filter_field?: string
+                    filter_values?: string[]
+                }
+                Update: {
+                    id?: string
+                    name_en?: string
+                    name_es?: string
+                    sort_order?: number
+                    filter_field?: string
+                    filter_values?: string[]
+                }
+                Relationships: []
+            }
             exercises: {
                 Row: {
                     ai_thumbnail_url: string | null

@@ -6,14 +6,17 @@
  *
  * Data flow:
  *   Server component (`/workouts/page.tsx`) fetches exercises via `getExercises()`
- *   → passes them as props here → client-side filtering by search term and category.
+ *   and categories via `getExerciseCategories()` → passes them as props here →
+ *   client-side filtering by search term and active category.
  *
- * Category mapping:
- *   - "Push" → exercises where `force` === "push"
- *   - "Pull" → exercises where `force` === "pull"
- *   - "Legs" → exercises targeting lower-body muscle groups
- *   - "Core" → exercises targeting abs, obliques, lower_back
- *   - "All"  → no filter applied
+ * Category matching is data-driven via `filter_field` / `filter_values` columns:
+ *   - filter_field "all"            → show every exercise
+ *   - filter_field "force"          → match exercise.force IN filter_values
+ *   - filter_field "primary_muscle" → match exercise.primary_muscle IN filter_values
+ *
+ * i18n:
+ *   Category labels are stored bilingually in the DB (name_en / name_es).
+ *   The active locale from `useTranslation()` selects which column to display.
  */
 
 import { useState, useMemo } from "react";
@@ -26,41 +29,34 @@ import { useTranslation, getExerciseName } from "@/i18n";
 
 type Exercise = Tables<"exercises">;
 
-/** Filter categories shown as pill buttons */
-type Category = "All" | "Push" | "Pull" | "Legs" | "Core";
-
-const CATEGORIES: Category[] = ["All", "Push", "Pull", "Legs", "Core"];
-
-/**
- * Muscle groups that belong to the "Legs" category.
- * Mapped from the `muscle_group` enum in the database.
- */
-const LEG_MUSCLES = new Set(["quads", "hamstrings", "glutes", "calves"]);
-
-/**
- * Muscle groups that belong to the "Core" category.
- */
-const CORE_MUSCLES = new Set(["abs", "obliques", "lower_back"]);
+/** A category row from the `exercise_categories` table. */
+type ExerciseCategory = Tables<"exercise_categories">;
 
 // ── Props ──────────────────────────────────────────────────────────────────────
 
 interface ExerciseLibraryProps {
     /** Pre-fetched exercises from the server component */
     exercises: Exercise[];
+    /** Pre-fetched categories from the server component (ordered by sort_order) */
+    categories: ExerciseCategory[];
 }
 
 // ── Filtering Logic ────────────────────────────────────────────────────────────
 
 /**
- * Determines whether an exercise matches the selected category.
- * Uses `force` type for Push/Pull and `primary_muscle` for Legs/Core.
+ * Determines whether an exercise belongs to the selected category.
+ *
+ * Uses the `filter_field` column to know which exercise property to check
+ * and `filter_values` for the list of qualifying DB enum values.
  */
-function matchesCategory(exercise: Exercise, category: Category): boolean {
-    if (category === "All") return true;
-    if (category === "Push") return exercise.force === "push";
-    if (category === "Pull") return exercise.force === "pull";
-    if (category === "Legs") return LEG_MUSCLES.has(exercise.primary_muscle);
-    if (category === "Core") return CORE_MUSCLES.has(exercise.primary_muscle);
+function matchesCategory(exercise: Exercise, category: ExerciseCategory): boolean {
+    if (category.filter_field === "all") return true;
+    if (category.filter_field === "force") {
+        return category.filter_values.includes(exercise.force ?? "");
+    }
+    if (category.filter_field === "primary_muscle") {
+        return category.filter_values.includes(exercise.primary_muscle);
+    }
     return true;
 }
 
@@ -86,18 +82,23 @@ const cardVariants: Variants = {
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
-export default function ExerciseLibrary({ exercises }: ExerciseLibraryProps) {
-    const [search, setSearch] = useState("");
-    const [activeCategory, setActiveCategory] = useState<Category>("All");
+export default function ExerciseLibrary({ exercises, categories }: ExerciseLibraryProps) {
     const { locale, t } = useTranslation();
+
+    // Default to the first category (expected to be "all") or undefined
+    const [activeCategory, setActiveCategory] = useState<ExerciseCategory | undefined>(
+        categories[0]
+    );
+
+    const [search, setSearch] = useState("");
 
     /** Filtered list — derived from search term and active category */
     const filtered = useMemo(() => {
         const query = search.toLowerCase().trim();
         return exercises.filter((ex) => {
-            // Category filter
-            if (!matchesCategory(ex, activeCategory)) return false;
-            // Search filter — matches name (both locales), muscle, or equipment
+            // Category filter using data-driven logic from DB
+            if (activeCategory && !matchesCategory(ex, activeCategory)) return false;
+            // Search filter — matches localised name, EN name, muscle, or equipment
             if (query) {
                 const haystack = `${getExerciseName(ex, locale)} ${ex.name} ${ex.primary_muscle} ${ex.equipment}`.toLowerCase();
                 return haystack.includes(query);
@@ -144,11 +145,13 @@ export default function ExerciseLibrary({ exercises }: ExerciseLibraryProps) {
             {/* ── Category Filters ────────────────────────────────────── */}
             <div className="px-5 pb-4">
                 <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    {CATEGORIES.map((cat) => {
-                        const isActive = cat === activeCategory;
+                    {categories.map((cat) => {
+                        const isActive = cat.id === activeCategory?.id;
+                        // Pick the label for the current locale
+                        const label = locale === "es" ? cat.name_es : cat.name_en;
                         return (
                             <button
-                                key={cat}
+                                key={cat.id}
                                 onClick={() => setActiveCategory(cat)}
                                 className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider
                                            whitespace-nowrap transition-all duration-200"
@@ -163,7 +166,7 @@ export default function ExerciseLibrary({ exercises }: ExerciseLibraryProps) {
                                         : "none",
                                 }}
                             >
-                                {cat}
+                                {label}
                             </button>
                         );
                     })}
@@ -173,11 +176,11 @@ export default function ExerciseLibrary({ exercises }: ExerciseLibraryProps) {
             {/* ── Exercise Grid ───────────────────────────────────────── */}
             <main className="flex-1 px-5 pb-28 overflow-y-auto">
                 {filtered.length === 0 ? (
-                    <EmptyState search={search} category={activeCategory} />
+                    <EmptyState search={search} categoryLabel={activeCategory ? (locale === "es" ? activeCategory.name_es : activeCategory.name_en) : ""} />
                 ) : (
                     <AnimatePresence mode="wait">
                         <motion.div
-                            key={`${activeCategory}-${search}`}
+                            key={`${activeCategory?.id}-${search}`}
                             className="grid grid-cols-2 gap-3"
                             variants={containerVariants}
                             initial="hidden"
@@ -296,7 +299,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
 /**
  * Empty state when no exercises match the current filters.
  */
-function EmptyState({ search, category }: { search: string; category: Category }) {
+function EmptyState({ search, categoryLabel }: { search: string; categoryLabel: string }) {
     const { t } = useTranslation();
     return (
         <div
@@ -304,11 +307,11 @@ function EmptyState({ search, category }: { search: string; category: Category }
             style={{ border: "1px solid rgba(255,255,255,0.05)", background: "#0a0a0a" }}
         >
             <Dumbbell className="w-12 h-12 mb-4" style={{ color: "rgba(57,255,20,0.2)" }} />
-            <p className="text-white font-semibold mb-1">{t("session.noExercisesMatch").replace(/ .*/, " " + t("nav.library").toLowerCase()) || "No exercises"}</p>
+            <p className="text-white font-semibold mb-1">{t("session.noExercisesMatch")}</p>
             <p className="text-sm text-white/30 max-w-[220px]">
                 {search
-                    ? `${t("session.noExercisesMatch")} "${search}"`
-                    : `${t("session.noExercisesYet")} (${category})`}
+                    ? `"${search}"`
+                    : categoryLabel}
             </p>
         </div>
     );
