@@ -26,6 +26,7 @@ import { Slider } from "@/components/ui/slider";
 import { updateProfile, signOut } from "./actions";
 import BottomNav from "@/components/home/BottomNav";
 import { useTranslation, type Locale } from "@/i18n";
+import { getXpProgress } from "@/lib/levels";
 import type { Tables } from "@/lib/supabase/database.types";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -104,7 +105,7 @@ export default function ProfileClient({ authEmail, profile }: ProfileClientProps
     const displayName = getDisplayName(profile, authEmail);
     const initials = getInitials(displayName);
     const xp = profile?.current_xp ?? 0;
-    const level = Math.floor(xp / 1000) + 1;
+    const level = getXpProgress(xp).level;
 
     async function handleLogout() {
         setLoggingOut(true);
@@ -121,7 +122,7 @@ export default function ProfileClient({ authEmail, profile }: ProfileClientProps
             <div className="px-5 pt-12 pb-6">
                 {/* Back arrow */}
                 <button
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push("/dashboard")}
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-6 transition-colors"
                 >
                     <ArrowLeft className="w-3.5 h-3.5" /> {t("profile.dashboard")}

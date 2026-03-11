@@ -2,7 +2,8 @@
 
 /**
  * @file components/home/ExerciseLibrary.tsx
- * Client Component — Exercise Library with search and category filters.
+ * Client Component — Exercise Library with search, category filters, and
+ * virtual scrolling for performance.
  *
  * Data flow:
  *   Server component (`/workouts/page.tsx`) fetches exercises via `getExercises()`
@@ -14,14 +15,25 @@
  *   - filter_field "force"          → match exercise.force IN filter_values
  *   - filter_field "primary_muscle" → match exercise.primary_muscle IN filter_values
  *
+ * Performance:
+ *   All 150 exercises are kept in memory for instant client-side filtering.
+ *   @tanstack/react-virtual virtualizes the grid rows so only ~10 DOM nodes
+ *   are rendered at any time instead of 150+, preventing scroll jank on mobile.
+ *
+ * Images:
+ *   Uses Next.js <Image fill> instead of CSS background-image for automatic
+ *   WebP/AVIF conversion, lazy loading, and responsive srcset.
+ *
  * i18n:
  *   Category labels are stored bilingually in the DB (name_en / name_es).
- *   The active locale from `useTranslation()` selects which column to display.
+ *   Muscle group and difficulty labels come from the i18n JSON dictionaries.
  */
 
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
-import { Search, Dumbbell } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Search, Dumbbell, ChevronDown, ChevronUp } from "lucide-react";
 import type { Tables } from "@/lib/supabase/database.types";
 import { useTranslation, getExerciseName } from "@/i18n";
 
@@ -60,30 +72,29 @@ function matchesCategory(exercise: Exercise, category: ExerciseCategory): boolea
     return true;
 }
 
-// ── Animation Variants ─────────────────────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────────────────
 
-const containerVariants: Variants = {
-    hidden: {},
-    visible: {
-        transition: { staggerChildren: 0.04 },
-    },
-};
+/**
+ * Estimated height (px) for a single virtual row (2 exercise cards).
+ *
+ * Cards have aspect-ratio 3/4. With max-w 480px container, 40px horizontal
+ * padding, and 12px gap between columns:
+ *   card width  ≈ (440 - 12) / 2 = 214px
+ *   card height ≈ 214 × (4/3) = 285px
+ *   row height  ≈ 285 + 12 (row gap) = 297px → rounded to 300
+ */
+const ESTIMATED_ROW_HEIGHT = 300;
 
-const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 20, scale: 0.95 },
-    visible: {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: { type: "spring", stiffness: 300, damping: 24 },
-    },
-    exit: { opacity: 0, scale: 0.9, transition: { duration: 0.15 } },
-};
+/** Number of extra rows rendered outside the visible viewport for smooth scrolling */
+const OVERSCAN_ROWS = 3;
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export default function ExerciseLibrary({ exercises, categories }: ExerciseLibraryProps) {
     const { locale, t } = useTranslation();
+
+    // Ref attached to the scrollable <main> — required by useVirtualizer
+    const scrollRef = useRef<HTMLElement>(null);
 
     // Default to the first category (expected to be "all") or undefined
     const [activeCategory, setActiveCategory] = useState<ExerciseCategory | undefined>(
@@ -91,8 +102,16 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
     );
 
     const [search, setSearch] = useState("");
+    const [showAllCategories, setShowAllCategories] = useState(false);
 
-    /** Filtered list — derived from search term and active category */
+    /** Number of category pills always visible before the "show more" button */
+    const VISIBLE_CAT_COUNT = 4;
+    const visibleCategories = showAllCategories
+        ? categories
+        : categories.slice(0, VISIBLE_CAT_COUNT);
+    const hiddenCount = categories.length - VISIBLE_CAT_COUNT;
+
+    /** Filtered flat list — derived from search term and active category */
     const filtered = useMemo(() => {
         const query = search.toLowerCase().trim();
         return exercises.filter((ex) => {
@@ -100,12 +119,35 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
             if (activeCategory && !matchesCategory(ex, activeCategory)) return false;
             // Search filter — matches localised name, EN name, muscle, or equipment
             if (query) {
-                const haystack = `${getExerciseName(ex, locale)} ${ex.name} ${ex.primary_muscle} ${ex.equipment}`.toLowerCase();
+                const haystack =
+                    `${getExerciseName(ex, locale)} ${ex.name} ${ex.primary_muscle} ${ex.equipment}`.toLowerCase();
                 return haystack.includes(query);
             }
             return true;
         });
     }, [exercises, search, activeCategory, locale]);
+
+    /**
+     * Exercises chunked into rows of 2 for the virtual grid.
+     * Each virtual row renders up to 2 `ExerciseCard` components side by side.
+     */
+    const rows = useMemo<Exercise[][]>(() => {
+        const result: Exercise[][] = [];
+        for (let i = 0; i < filtered.length; i += 2) {
+            result.push(filtered.slice(i, i + 2));
+        }
+        return result;
+    }, [filtered]);
+
+    /** Virtual row manager — controls which rows are mounted in the DOM */
+    const rowVirtualizer = useVirtualizer({
+        count: rows.length,
+        getScrollElement: () => scrollRef.current,
+        estimateSize: () => ESTIMATED_ROW_HEIGHT,
+        overscan: OVERSCAN_ROWS,
+    });
+
+    const virtualItems = rowVirtualizer.getVirtualItems();
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -114,10 +156,10 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
                 <div className="flex items-center gap-2 mb-1">
                     <Dumbbell className="w-5 h-5" style={{ color: "#39ff14" }} />
                     <p className="text-xs tracking-[0.3em] text-white/30 uppercase">
-                        Exercise
+                        {t("exercise.eyebrow")}
                     </p>
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-4">Library</h1>
+                <h1 className="text-2xl font-bold text-white mb-4">{t("nav.library")}</h1>
 
                 {/* Search Bar */}
                 <div className="relative group mb-4">
@@ -144,10 +186,9 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
 
             {/* ── Category Filters ────────────────────────────────────── */}
             <div className="px-5 pb-4">
-                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    {categories.map((cat) => {
+                <div className="flex flex-wrap gap-2">
+                    {visibleCategories.map((cat) => {
                         const isActive = cat.id === activeCategory?.id;
-                        // Pick the label for the current locale
                         const label = locale === "es" ? cat.name_es : cat.name_en;
                         return (
                             <button
@@ -170,28 +211,82 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
                             </button>
                         );
                     })}
+
+                    {/* Show more / show less toggle */}
+                    {hiddenCount > 0 && (
+                        <button
+                            onClick={() => setShowAllCategories((prev) => !prev)}
+                            className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider
+                                       whitespace-nowrap transition-all duration-200 flex items-center gap-1"
+                            style={{
+                                background: "rgba(57,255,20,0.06)",
+                                color: "#39ff14",
+                                border: "1px solid rgba(57,255,20,0.2)",
+                            }}
+                        >
+                            {showAllCategories ? (
+                                <>
+                                    <ChevronUp className="w-3 h-3" />
+                                    {locale === "es" ? "Ver menos" : "See less"}
+                                </>
+                            ) : (
+                                <>
+                                    <ChevronDown className="w-3 h-3" />
+                                    {locale === "es" ? "Ver más" : "See more"}
+                                </>
+                            )}
+                        </button>
+                    )}
                 </div>
             </div>
 
-            {/* ── Exercise Grid ───────────────────────────────────────── */}
-            <main className="flex-1 px-5 pb-28 overflow-y-auto">
+            {/* ── Exercise Grid (virtualized) ─────────────────────────── */}
+            <main ref={scrollRef} className="flex-1 pb-28 overflow-y-auto">
                 {filtered.length === 0 ? (
-                    <EmptyState search={search} categoryLabel={activeCategory ? (locale === "es" ? activeCategory.name_es : activeCategory.name_en) : ""} />
+                    <div className="px-5">
+                        <EmptyState
+                            search={search}
+                            categoryLabel={
+                                activeCategory
+                                    ? locale === "es"
+                                        ? activeCategory.name_es
+                                        : activeCategory.name_en
+                                    : ""
+                            }
+                        />
+                    </div>
                 ) : (
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={`${activeCategory?.id}-${search}`}
-                            className="grid grid-cols-2 gap-3"
-                            variants={containerVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="hidden"
+                    /*
+                     * Outer div: full virtual height so the scrollbar reflects the
+                     * total content size. Inner div: shifts the visible rows to the
+                     * correct scroll position using translateY.
+                     */
+                    <div
+                        style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: "relative" }}
+                    >
+                        <div
+                            style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                transform: `translateY(${virtualItems[0]?.start ?? 0}px)`,
+                            }}
                         >
-                            {filtered.map((exercise) => (
-                                <ExerciseCard key={exercise.id} exercise={exercise} />
+                            {virtualItems.map((virtualRow) => (
+                                <div
+                                    key={virtualRow.key}
+                                    data-index={virtualRow.index}
+                                    ref={rowVirtualizer.measureElement}
+                                    className="grid grid-cols-2 gap-3 px-5 pb-3"
+                                >
+                                    {rows[virtualRow.index].map((exercise) => (
+                                        <ExerciseCard key={exercise.id} exercise={exercise} />
+                                    ))}
+                                </div>
                             ))}
-                        </motion.div>
-                    </AnimatePresence>
+                        </div>
+                    </div>
                 )}
             </main>
         </div>
@@ -200,29 +295,45 @@ export default function ExerciseLibrary({ exercises, categories }: ExerciseLibra
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
+/** Fade-in variant used by each card entering the viewport */
+const cardVariants = {
+    hidden: { opacity: 0, scale: 0.96 },
+    visible: {
+        opacity: 1,
+        scale: 1,
+        transition: { type: "spring" as const, stiffness: 280, damping: 22 },
+    },
+};
+
 /**
- * Single exercise card — Stitch-inspired design adapted to our neon-green system.
- * Shows a background image (from `ai_thumbnail_url`), muscle badge, and exercise name.
+ * Single exercise card — dark neon design.
+ *
+ * Uses Next.js `<Image fill>` for optimized image loading (WebP, lazy, srcset).
+ * Falls back to a gradient placeholder when no thumbnail exists yet.
  */
 function ExerciseCard({ exercise }: { exercise: Exercise }) {
-    const muscleName = formatMuscle(exercise.primary_muscle);
+    const { locale, t } = useTranslation();
     const hasImage = !!exercise.ai_thumbnail_url;
-    const { locale } = useTranslation();
     const displayName = getExerciseName(exercise, locale);
+    const muscleName = t(`muscles.${exercise.primary_muscle}`);
+    const difficultyLabel = exercise.difficulty ? t(`levels.${exercise.difficulty}`) : null;
 
     return (
         <motion.div
             variants={cardVariants}
-            layout
-            className="relative aspect-[3/4] rounded-xl overflow-hidden group cursor-pointer"
+            initial="hidden"
+            animate="visible"
+            className="relative aspect-3/4 rounded-xl overflow-hidden group cursor-pointer"
             style={{ border: "1px solid rgba(255,255,255,0.06)" }}
         >
-            {/* Background image or gradient fallback */}
+            {/* Background: optimized image or gradient fallback */}
             {hasImage ? (
-                <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500
-                               group-hover:scale-110"
-                    style={{ backgroundImage: `url(${exercise.ai_thumbnail_url})` }}
+                <Image
+                    src={exercise.ai_thumbnail_url!}
+                    alt={exercise.name}
+                    fill
+                    sizes="(max-width: 480px) 50vw, 240px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
             ) : (
                 <div
@@ -240,54 +351,50 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             )}
 
             {/* Dark gradient overlay for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black via-black/30 to-transparent" />
 
-            {/* Muscle group badge */}
-            <span
-                className="absolute top-2.5 left-2.5 text-[9px] font-bold uppercase tracking-[0.12em]
-                           px-2 py-0.5 rounded-sm backdrop-blur-md"
-                style={{
-                    color: "#39ff14",
-                    background: "rgba(57,255,20,0.12)",
-                    border: "1px solid rgba(57,255,20,0.25)",
-                }}
-            >
-                {muscleName}
-            </span>
-
-            {/* Difficulty badge — only if available */}
-            {exercise.difficulty && (
+            {/* Category + Difficulty badges */}
+            <div className="absolute top-2.5 left-2.5 right-2.5 flex flex-wrap gap-1">
                 <span
-                    className="absolute top-2.5 right-2.5 text-[8px] font-semibold uppercase tracking-wider
-                               px-1.5 py-0.5 rounded-sm"
+                    className="text-[9px] font-bold uppercase tracking-[0.12em]
+                               px-2 py-0.5 rounded-sm backdrop-blur-md"
                     style={{
-                        color: "rgba(255,255,255,0.5)",
-                        background: "rgba(255,255,255,0.06)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        color: "#39ff14",
+                        background: "rgba(57,255,20,0.12)",
+                        border: "1px solid rgba(57,255,20,0.25)",
                     }}
                 >
-                    {exercise.difficulty}
+                    {muscleName}
                 </span>
-            )}
 
-            {/* Bottom: exercise name + equipment icon */}
+                {difficultyLabel && (
+                    <span
+                        className="text-[8px] font-semibold uppercase tracking-wider
+                                   px-1.5 py-0.5 rounded-sm"
+                        style={{
+                            color: "rgba(255,255,255,0.5)",
+                            background: "rgba(255,255,255,0.06)",
+                            border: "1px solid rgba(255,255,255,0.08)",
+                        }}
+                    >
+                        {difficultyLabel}
+                    </span>
+                )}
+            </div>
+
+            {/* Bottom: exercise name + neon play button */}
             <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
                 <p className="text-white font-bold text-sm leading-tight uppercase max-w-[80%]">
                     {displayName}
                 </p>
-                {/* Neon play-style circle — decorative, matching Stitch design */}
                 <div
-                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
+                    className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center"
                     style={{
                         background: "#39ff14",
                         boxShadow: "0 0 12px rgba(57,255,20,0.5)",
                     }}
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="black"
-                        className="w-3.5 h-3.5 ml-0.5"
-                    >
+                    <svg viewBox="0 0 24 24" fill="black" className="w-3.5 h-3.5 ml-0.5">
                         <path d="M8 5v14l11-7z" />
                     </svg>
                 </div>
@@ -308,24 +415,9 @@ function EmptyState({ search, categoryLabel }: { search: string; categoryLabel: 
         >
             <Dumbbell className="w-12 h-12 mb-4" style={{ color: "rgba(57,255,20,0.2)" }} />
             <p className="text-white font-semibold mb-1">{t("session.noExercisesMatch")}</p>
-            <p className="text-sm text-white/30 max-w-[220px]">
-                {search
-                    ? `"${search}"`
-                    : categoryLabel}
+            <p className="text-sm text-white/30 max-w-55">
+                {search ? `"${search}"` : categoryLabel}
             </p>
         </div>
     );
-}
-
-// ── Utilities ──────────────────────────────────────────────────────────────────
-
-/**
- * Formats a `muscle_group` enum value into a human-readable label.
- * E.g. "lower_back" → "Lower Back", "abs" → "Abs"
- */
-function formatMuscle(muscle: string): string {
-    return muscle
-        .split("_")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
 }

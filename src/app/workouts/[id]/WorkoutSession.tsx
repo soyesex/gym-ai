@@ -283,19 +283,21 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
              * Centered with left-1/2 + -translate-x-1/2 (margin:auto has no
              * effect on position:fixed elements).
              * bottom-28 clears the BottomNav bar (~64 px tall).
-             * The button is fixed directly — no wrapper needed.
+             * Hidden when no exercises exist — the empty-state button is shown instead.
              */}
-            <button
-                onClick={() => setShowPicker(true)}
-                className="fixed bottom-28 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold shadow-2xl"
-                style={{
-                    background: "#39ff14",
-                    color: "#000",
-                    boxShadow: "0 0 24px rgba(57,255,20,0.4)",
-                }}
-            >
-                <Plus className="w-4 h-4" /> {t("session.addExercise")}
-            </button>
+            {grouped.size > 0 && (
+                <button
+                    onClick={() => setShowPicker(true)}
+                    className="fixed bottom-28 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold shadow-2xl"
+                    style={{
+                        background: "#39ff14",
+                        color: "#000",
+                        boxShadow: "0 0 24px rgba(57,255,20,0.4)",
+                    }}
+                >
+                    <Plus className="w-4 h-4" /> {t("session.addExercise")}
+                </button>
+            )}
 
             {/* ── Exercise Picker Sheet ── */}
             <ExercisePicker

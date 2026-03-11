@@ -59,7 +59,7 @@ const I18nContext = createContext<I18nContextValue | null>(null);
 
 // ── Provider ───────────────────────────────────────────────────────────────────
 
-export function I18nProvider({ children, initialLocale = "en" }: { children: ReactNode; initialLocale?: Locale }) {
+export function I18nProvider({ children, initialLocale = "es" }: { children: ReactNode; initialLocale?: Locale }) {
     // SSR-safe: start with the cookie-provided locale, then hydrate from localStorage
     const [locale, setLocaleState] = useState<Locale>(initialLocale);
 

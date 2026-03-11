@@ -278,7 +278,7 @@ export default function OnboardingWizard({ authName }: OnboardingWizardProps) {
                             <StepComplete
                                 name={formData.full_name || authName || ""}
                                 onEnter={() => {
-                                    router.push("/");
+                                    router.push("/dashboard");
                                     router.refresh();
                                 }}
                             />

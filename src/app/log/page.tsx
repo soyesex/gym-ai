@@ -34,9 +34,9 @@ function formatDuration(seconds: number): string {
     return s === 0 ? `${m} min` : `${m}m ${s}s`;
 }
 
-function formatDate(isoString: string | null): string {
+function formatDate(isoString: string | null, locale: Locale): string {
     if (!isoString) return "—";
-    return new Date(isoString).toLocaleDateString("en-US", {
+    return new Date(isoString).toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
@@ -98,7 +98,7 @@ export default async function TrainingLogPage() {
                 {workouts.length === 0 ? (
                     <EmptyState dict={dict} />
                 ) : (
-                    workouts.map((w) => <WorkoutCard key={w.id} workout={w} dict={dict} />)
+                    workouts.map((w) => <WorkoutCard key={w.id} workout={w} dict={dict} locale={locale} />)
                 )}
             </div>
 
@@ -131,7 +131,7 @@ function EmptyState({ dict }: { dict: typeof en }) {
     );
 }
 
-function WorkoutCard({ workout: w, dict }: { workout: Workout; dict: typeof en }) {
+function WorkoutCard({ workout: w, dict, locale }: { workout: Workout; dict: typeof en; locale: Locale }) {
     const statusRaw = w.status ?? "active";
     const statusCfg = STATUS_CONFIG[statusRaw];
     const statusLabel = dict.log[statusRaw as keyof typeof dict.log] || statusCfg.label;
@@ -169,7 +169,7 @@ function WorkoutCard({ workout: w, dict }: { workout: Workout; dict: typeof en }
                     </span>
                     <span className="flex items-center gap-1">
                         <CheckCircle2 className="w-3 h-3" />
-                        {formatDate(w.started_at)}
+                        {formatDate(w.started_at, locale)}
                     </span>
                     {w.subjective_difficulty != null && (
                         <span className="flex items-center gap-1">

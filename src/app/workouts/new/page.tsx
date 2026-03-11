@@ -5,29 +5,37 @@
  * "Start Workout" page — a simple form: name the session, tap Start.
  * Calls createWorkout() Server Action and redirects to the active session.
  */
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Dumbbell, Loader2 } from "lucide-react";
 import { createWorkout } from "@/app/workouts/actions";
+import { useTranslation } from "@/i18n";
 import BottomNav from "@/components/home/BottomNav";
 
-// ── Quick-pick name suggestions ────────────────────────────────────────────────
-const QUICK_NAMES = [
-    "Push Day A",
-    "Pull Day B",
-    "Leg Day",
-    "Upper Body",
-    "Full Body",
-    "Cardio",
-];
+// Quick-pick keys — mapped to i18n keys under "newWorkout.*"
+const QUICK_PICK_KEYS = [
+    "newWorkout.pushDay",
+    "newWorkout.pullDay",
+    "newWorkout.legDay",
+    "newWorkout.upperBody",
+    "newWorkout.fullBody",
+    "newWorkout.cardio",
+] as const;
 
 export default function NewWorkoutPage() {
     const router = useRouter();
+    const { t } = useTranslation();
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const trimmed = name.trim();
+
+    // Translated quick-pick names
+    const quickNames = useMemo(
+        () => QUICK_PICK_KEYS.map((key) => t(key)),
+        [t],
+    );
 
     async function handleStart() {
         if (!trimmed) return;
@@ -57,16 +65,16 @@ export default function NewWorkoutPage() {
                     onClick={() => router.back()}
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-8 transition-colors"
                 >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Back
+                    <ArrowLeft className="w-3.5 h-3.5" /> {t("newWorkout.back")}
                 </button>
 
                 <Dumbbell
                     className="w-10 h-10 mb-4"
                     style={{ color: "#39ff14", filter: "drop-shadow(0 0 8px rgba(57,255,20,0.5))" }}
                 />
-                <h1 className="text-2xl font-bold text-white mb-1">New Session</h1>
+                <h1 className="text-2xl font-bold text-white mb-1">{t("newWorkout.title")}</h1>
                 <p className="text-sm text-white/40">
-                    Name your workout, then start tracking sets.
+                    {t("newWorkout.subtitle")}
                 </p>
             </div>
 
@@ -75,13 +83,13 @@ export default function NewWorkoutPage() {
                 {/* Name input */}
                 <div>
                     <p className="text-xs text-white/40 uppercase tracking-widest mb-3">
-                        Workout Name
+                        {t("newWorkout.nameLabel")}
                     </p>
                     <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Push Day A"
+                        placeholder={t("newWorkout.namePlaceholder")}
                         onKeyDown={(e) => e.key === "Enter" && handleStart()}
                         className="w-full text-white text-base outline-none rounded-2xl px-4 py-4 placeholder:text-white/20"
                         style={{
@@ -97,10 +105,10 @@ export default function NewWorkoutPage() {
                 {/* Quick-pick pills */}
                 <div>
                     <p className="text-xs text-white/25 uppercase tracking-widest mb-3">
-                        Quick Pick
+                        {t("newWorkout.quickPick")}
                     </p>
                     <div className="flex flex-wrap gap-2">
-                        {QUICK_NAMES.map((n) => (
+                        {quickNames.map((n) => (
                             <button
                                 key={n}
                                 onClick={() => setName(n)}
@@ -142,7 +150,7 @@ export default function NewWorkoutPage() {
                 >
                     {loading
                         ? <Loader2 className="w-5 h-5 animate-spin" />
-                        : "Start Session →"}
+                        : t("newWorkout.start")}
                 </button>
             </div>
 

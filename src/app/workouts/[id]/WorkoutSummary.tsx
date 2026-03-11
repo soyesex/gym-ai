@@ -2,11 +2,21 @@
  * @file app/workouts/[id]/WorkoutSummary.tsx
  * Read-only summary displayed when a workout is completed.
  * Shows total duration, difficulty rating, and the logged sets grouped by exercise.
+ *
+ * This is a Server Component — locale comes via props from the parent page
+ * which reads it from the `gym-ai-locale` cookie.
  */
 import Link from "next/link";
 import { ArrowLeft, CheckCircle2, Clock3, Zap } from "lucide-react";
 import BottomNav from "@/components/home/BottomNav";
 import type { WorkoutWithSets } from "@/lib/supabase/queries";
+import type { Locale } from "@/i18n";
+import en from "@/i18n/en.json";
+import es from "@/i18n/es.json";
+
+function getDict(locale: Locale) {
+    return locale === "es" ? es : en;
+}
 
 function formatDuration(seconds: number): string {
     const h = Math.floor(seconds / 3600);
@@ -16,16 +26,18 @@ function formatDuration(seconds: number): string {
     return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
-function formatDate(isoString: string | null): string {
+function formatDate(isoString: string | null, locale: Locale): string {
     if (!isoString) return "—";
-    return new Date(isoString).toLocaleDateString("en-US", {
+    return new Date(isoString).toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
         weekday: "long",
         month: "long",
         day: "numeric",
     });
 }
 
-export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }) {
+export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWithSets; locale: Locale }) {
+    const dict = getDict(locale);
+
     // Group sets by exercise for display
     const groups = new Map<string, { name: string; sets: WorkoutWithSets["sets"] }>();
     for (const set of workout.sets) {
@@ -47,7 +59,7 @@ export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }
                     href="/log"
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-6 transition-colors"
                 >
-                    <ArrowLeft className="w-3.5 h-3.5" /> Training Log
+                    <ArrowLeft className="w-3.5 h-3.5" /> {dict.summary.backToLog}
                 </Link>
 
                 {/* Completed badge */}
@@ -56,11 +68,11 @@ export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }
                     style={{ background: "rgba(57,255,20,0.1)", color: "#39ff14", border: "1px solid rgba(57,255,20,0.2)" }}
                 >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    Completed
+                    {dict.summary.completed}
                 </div>
 
                 <h1 className="text-2xl font-bold text-white mb-1">{workout.name}</h1>
-                <p className="text-sm text-white/35">{formatDate(workout.started_at)}</p>
+                <p className="text-sm text-white/35">{formatDate(workout.started_at, locale)}</p>
 
                 {/* Stats row */}
                 <div className="flex gap-6 mt-4">
@@ -69,7 +81,7 @@ export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }
                             {formatDuration(workout.duration_seconds ?? 0)}
                         </p>
                         <p className="text-xs text-white/35 flex items-center gap-1 mt-0.5">
-                            <Clock3 className="w-3 h-3" /> Duration
+                            <Clock3 className="w-3 h-3" /> {dict.summary.duration}
                         </p>
                     </div>
                     {workout.subjective_difficulty != null && (
@@ -79,13 +91,13 @@ export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }
                                 <span className="text-sm text-white/30">/10</span>
                             </p>
                             <p className="text-xs text-white/35 flex items-center gap-1 mt-0.5">
-                                <Zap className="w-3 h-3" /> Difficulty
+                                <Zap className="w-3 h-3" /> {dict.summary.difficulty}
                             </p>
                         </div>
                     )}
                     <div>
                         <p className="text-2xl font-bold text-white">{workout.sets.length}</p>
-                        <p className="text-xs text-white/35 mt-0.5">Total sets</p>
+                        <p className="text-xs text-white/35 mt-0.5">{dict.summary.totalSets}</p>
                     </div>
                 </div>
             </div>
@@ -107,9 +119,9 @@ export default function WorkoutSummary({ workout }: { workout: WorkoutWithSets }
 
                         {/* Column header */}
                         <div className="grid grid-cols-3 gap-2 px-4 py-2">
-                            <p className="text-[10px] text-white/25 text-center">SET</p>
-                            <p className="text-[10px] text-white/25 text-center">KG</p>
-                            <p className="text-[10px] text-white/25 text-center">REPS</p>
+                            <p className="text-[10px] text-white/25 text-center">{dict.summary.set}</p>
+                            <p className="text-[10px] text-white/25 text-center">{dict.summary.kg}</p>
+                            <p className="text-[10px] text-white/25 text-center">{dict.summary.reps}</p>
                         </div>
 
                         {group.sets.map((set, i) => (

@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Cpu, TrendingUp, LogOut, Play } from "lucide-react";
 import { useTranslation } from "@/i18n";
+import { getXpProgress, getLevelInfo } from "@/lib/levels";
 import RecommendedModuleCard from "@/components/home/RecommendedModuleCard";
 import BottomNav from "@/components/home/BottomNav";
 import { createClient } from "@/lib/supabase/client";
@@ -58,14 +59,7 @@ const fadeUp = {
     visible: { opacity: 1, y: 0 },
 };
 
-// Level keys — map DB enum values to translation keys in the `levels` namespace
-const LEVEL_KEYS: Record<string, string> = {
-    sedentary: "levels.sedentary",
-    beginner: "levels.beginner",
-    intermediate: "levels.intermediate",
-    advanced: "levels.advanced",
-    elite: "levels.elite",
-};
+
 
 // ---------------------------------------------------------------------------
 
@@ -125,11 +119,15 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
     const emailPrefix = authEmail?.split("@")[0] ?? null;
     const displayName = profile?.full_name ?? profile?.username ?? emailPrefix ?? "Agent";
 
-    // XP progress within the current level (0-1000 XP = Level 1, 1000-2000 = Level 2…)
+    // XP progress within the current level — uses shared level thresholds
     const xp = profile?.current_xp ?? 0;
-    const level = profile?.current_level ?? 1;
-    const xpInCurrentLevel = xp % 1000;
-    const xpProgressPercent = Math.round((xpInCurrentLevel / 1000) * 100);
+    const xpProgress = getXpProgress(xp);
+    const level = xpProgress.level;
+    const xpProgressPercent = xpProgress.percent;
+
+    // Level label from the shared level table
+    const levelInfo = getLevelInfo(level);
+    const levelLabel = xpProgress.isMaxLevel ? t("home.maxLevel") : t(levelInfo.nameKey).toUpperCase();
 
     // Weekly training days goal from profile
     const targetDays = profile?.days_per_week ?? 5;
@@ -137,10 +135,6 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
 
     // Total training minutes this week
     const weeklyMinutes = Math.round(weeklyStats.totalDurationSeconds / 60);
-
-    // Experience level label — translated via dictionary
-    const levelKey = LEVEL_KEYS[profile?.level ?? "beginner"] ?? "levels.beginner";
-    const levelLabel = t(levelKey).toUpperCase();
 
     // ── Render ───────────────────────────────────────────────────────────────
     return (

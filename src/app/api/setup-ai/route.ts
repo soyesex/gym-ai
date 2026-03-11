@@ -14,7 +14,19 @@ import { generateExerciseEmbeddings } from "@/lib/ai/recommendations";
 
 export const maxDuration = 120; // Allow up to 2 minutes for large batches
 
-export async function GET() {
+export async function GET(request: Request) {
+    // Protect admin endpoint — requires ADMIN_SECRET query param
+    const { searchParams } = new URL(request.url);
+    const secret = searchParams.get("secret");
+    const adminSecret = process.env.ADMIN_SECRET;
+
+    if (!adminSecret || secret !== adminSecret) {
+        return Response.json(
+            { success: false, error: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
     try {
         console.log("[setup-ai] Starting embedding generation...");
 

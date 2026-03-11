@@ -11,8 +11,17 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "GYM-AI | Underground Tech Fitness",
-  description: "AI-powered biometric training protocols for peak performance.",
+  title: {
+    default: "GYM-AI — Entrenamiento Inteligente con IA",
+    template: "%s | GYM-AI",
+  },
+  description: "Tu entrenador personal con inteligencia artificial. Rutinas personalizadas, tracking de progreso y gamificación.",
+  metadataBase: new URL("https://gym-ai.vercel.app"),
+  openGraph: {
+    type: "website",
+    locale: "es_CO",
+    siteName: "GYM-AI",
+  },
 };
 
 export default async function RootLayout({
@@ -21,7 +30,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const locale = (cookieStore.get("gym-ai-locale")?.value ?? "en") as Locale;
+  const locale = (cookieStore.get("gym-ai-locale")?.value ?? "es") as Locale;
 
   return (
     <html lang={locale} className="dark">

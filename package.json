@@ -12,6 +12,7 @@
     "@google/genai": "^1.42.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
+    "@tanstack/react-virtual": "^3.13.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.2",

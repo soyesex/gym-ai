@@ -5,6 +5,20 @@
         "stats": "Estadísticas",
         "profile": "Perfil"
     },
+    "auth": {
+        "logIn": "Iniciar Sesión",
+        "signUp": "Crear Cuenta",
+        "subtitle": "Entrenamiento Inteligente con IA",
+        "usernamePlaceholder": "Nombre de usuario",
+        "emailPlaceholder": "Correo electrónico",
+        "passwordPlaceholder": "Contraseña",
+        "loginSubmit": "ACCEDER AL SISTEMA",
+        "signupSubmit": "INICIALIZAR PROTOCOLO",
+        "signupSuccess": "¡Cuenta creada! Revisa tu correo para confirmar tu dirección, luego inicia sesión.",
+        "unexpectedError": "Ocurrió un error inesperado.",
+        "securedBy": "Protegido por Supabase Auth · RLS activado",
+        "back": "Volver"
+    },
     "home": {
         "welcomeBack": "Bienvenido/a",
         "trainingProtocol": "Protocolo de Entrenamiento",
@@ -27,7 +41,8 @@
         "creating": "CREANDO…",
         "beginner": "PRINCIPIANTE",
         "intermediate": "INTERMEDIO",
-        "advanced": "AVANZADO"
+        "advanced": "AVANZADO",
+        "maxLevel": "NIVEL MÁXIMO"
     },
     "profile": {
         "dashboard": "Panel",
@@ -65,9 +80,14 @@
     "levels": {
         "sedentary": "Sedentario",
         "beginner": "Principiante",
+        "novice": "Novato",
         "intermediate": "Intermedio",
+        "dedicated": "Dedicado",
         "advanced": "Avanzado",
-        "elite": "Élite"
+        "athlete": "Atleta",
+        "elite": "Élite",
+        "beast": "Bestia",
+        "legend": "Leyenda"
     },
     "equipment": {
         "bodyweight": "Sin Equipamiento",
@@ -148,6 +168,26 @@
         "skipped": "Omitido",
         "inProgress": "En progreso"
     },
+    "exercise": {
+        "eyebrow": "Ejercicio"
+    },
+    "muscles": {
+        "chest": "Pecho",
+        "lats": "Dorsales",
+        "traps": "Trapecios",
+        "shoulders": "Hombros",
+        "triceps": "Tríceps",
+        "biceps": "Bíceps",
+        "forearms": "Antebrazos",
+        "obliques": "Oblicuos",
+        "abs": "Abdominales",
+        "lower_back": "Zona Lumbar",
+        "glutes": "Glúteos",
+        "quads": "Cuádriceps",
+        "hamstrings": "Isquiotibiales",
+        "calves": "Pantorrillas",
+        "cardio_system": "Cardio"
+    },
     "session": {
         "workouts": "Entrenamientos",
         "finish": "Finalizar",
@@ -165,5 +205,66 @@
         "cancel": "Cancelar",
         "reps": "REPS",
         "kg": "KG"
+    },
+    "landing": {
+        "login": "Iniciar Sesión",
+        "badge": "Potenciado por IA",
+        "tagline": "Tu entrenador personal con inteligencia artificial. Rutinas que se adaptan a ti, no al revés.",
+        "cta": "EMPIEZA GRATIS",
+        "learnMore": "Conoce más",
+        "featuresEyebrow": "Funcionalidades",
+        "featuresTitle": "Todo lo que necesitas para entrenar mejor",
+        "feature1Title": "Rutinas con Inteligencia Artificial",
+        "feature1Desc": "Nuestro sistema RAG analiza tu perfil y te recomienda rutinas personalizadas que se ajustan a tus objetivos y nivel.",
+        "feature2Title": "Planes Según Tu Nivel",
+        "feature2Desc": "Desde principiante hasta élite. La IA calibra la intensidad, volumen y ejercicios según tu experiencia real.",
+        "feature3Title": "Tracking de Progreso",
+        "feature3Desc": "Registra cada serie, repetición y peso. Visualiza tu evolución y nunca pierdas el hilo de tu entrenamiento.",
+        "feature4Title": "Sistema de Niveles y XP",
+        "feature4Desc": "Gana experiencia con cada sesión completada. Sube de nivel y desbloquea nuevos desafíos. Tu progreso, gamificado.",
+        "howEyebrow": "Cómo Funciona",
+        "howTitle": "En 3 pasos estás entrenando",
+        "step1Title": "Crea tu perfil",
+        "step1Desc": "Completa un onboarding rápido: tu objetivo, nivel de experiencia, equipamiento disponible y métricas corporales.",
+        "step2Title": "La IA genera tu plan",
+        "step2Desc": "Nuestro motor de IA analiza tu perfil contra una base de datos de ejercicios y crea módulos de entrenamiento a tu medida.",
+        "step3Title": "Entrena y sube de nivel",
+        "step3Desc": "Registra tus sesiones, gana XP por cada entrenamiento completado y observa cómo evolucionas semana a semana.",
+        "ctaTitle": "¿Listo para entrenar inteligente?",
+        "ctaDesc": "Únete a GYM-AI y deja que la inteligencia artificial potencie tu entrenamiento. Sin costo, sin compromiso.",
+        "footerMade": "Hecho con ❤️ y proteína en Colombia",
+        "footerRights": "Todos los derechos reservados.",
+        "mockWelcome": "Bienvenido/a",
+        "mockProgress": "Progreso Semanal",
+        "mockModule1": "Pecho & Tríceps — Fuerza",
+        "mockModule1Detail": "6 ejercicios · 45 min",
+        "mockModule2": "Pierna Completa — Hipertrofia",
+        "mockModule2Detail": "4 ejercicios · 30 min",
+        "mockStart": "INICIAR"
+    },
+    "summary": {
+        "backToLog": "Registro de Entrenamientos",
+        "completed": "Completado",
+        "duration": "Duración",
+        "difficulty": "Dificultad",
+        "totalSets": "Series totales",
+        "set": "SERIE",
+        "kg": "KG",
+        "reps": "REPS"
+    },
+    "newWorkout": {
+        "back": "Volver",
+        "title": "Nueva Sesión",
+        "subtitle": "Nombra tu entrenamiento y empieza a registrar series.",
+        "nameLabel": "Nombre del Entrenamiento",
+        "namePlaceholder": "ej. Pecho y Tríceps",
+        "quickPick": "Selección Rápida",
+        "start": "Iniciar Sesión →",
+        "pushDay": "Día de Empuje A",
+        "pullDay": "Día de Tirón B",
+        "legDay": "Día de Piernas",
+        "upperBody": "Tren Superior",
+        "fullBody": "Cuerpo Completo",
+        "cardio": "Cardio"
     }
 }

@@ -20,7 +20,8 @@ import { NextResponse, type NextRequest } from "next/server";
 const AUTH_ROUTES = ["/login", "/signup"];
 
 // Routes that REQUIRE authentication — exact or prefix (must be followed by "/" or end of string)
-const PROTECTED_ROUTES = ["/", "/onboarding", "/profile", "/workouts", "/log", "/stats"];
+// NOTE: "/" is intentionally NOT here — it serves the public landing page.
+const PROTECTED_ROUTES = ["/dashboard", "/onboarding", "/profile", "/workouts", "/log", "/stats"];
 
 export async function middleware(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });
@@ -57,9 +58,9 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // Exact match for "/" or segment-aware prefix match (avoids "/log" matching "/login")
+    // Segment-aware prefix match (avoids "/log" matching "/login")
     const isProtected = PROTECTED_ROUTES.some((route) =>
-        route === "/" ? pathname === "/" : pathname === route || pathname.startsWith(route + "/")
+        pathname === route || pathname.startsWith(route + "/")
     );
 
     // Public auth routes — skip all guards if the user is already on one
@@ -72,10 +73,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // If logged in and trying to access an auth route → send to home
+    // If logged in and trying to access an auth route → send to dashboard
     if (user && isAuthRoute) {
         const homeUrl = request.nextUrl.clone();
-        homeUrl.pathname = "/";
+        homeUrl.pathname = "/dashboard";
         return NextResponse.redirect(homeUrl);
     }
 

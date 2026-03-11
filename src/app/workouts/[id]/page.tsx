@@ -7,9 +7,11 @@
  * - If not found (404 / RLS)      → notFound()
  */
 import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { getWorkoutWithSets, getExercises, getProfile, isProfileComplete } from "@/lib/supabase/queries";
 import WorkoutSession from "./WorkoutSession";
 import WorkoutSummary from "./WorkoutSummary";
+import type { Locale } from "@/i18n";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -35,5 +37,8 @@ export default async function WorkoutPage({ params }: PageProps) {
         return <WorkoutSession workout={workout} exercises={exercises} />;
     }
 
-    return <WorkoutSummary workout={workout} />;
+    const cookieStore = await cookies();
+    const locale = (cookieStore.get("gym-ai-locale")?.value ?? "es") as Locale;
+
+    return <WorkoutSummary workout={workout} locale={locale} />;
 }

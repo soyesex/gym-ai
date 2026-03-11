@@ -5,6 +5,20 @@
         "stats": "Stats",
         "profile": "Profile"
     },
+    "auth": {
+        "logIn": "Log In",
+        "signUp": "Sign Up",
+        "subtitle": "AI-Powered Smart Training",
+        "usernamePlaceholder": "Username",
+        "emailPlaceholder": "Email",
+        "passwordPlaceholder": "Password",
+        "loginSubmit": "ACCESS SYSTEM",
+        "signupSubmit": "INITIALIZE PROTOCOL",
+        "signupSuccess": "Account created! Check your email to confirm your address, then log in.",
+        "unexpectedError": "An unexpected error occurred.",
+        "securedBy": "Secured by Supabase Auth · RLS enabled",
+        "back": "Back"
+    },
     "home": {
         "welcomeBack": "Welcome back",
         "trainingProtocol": "Training Protocol",
@@ -27,7 +41,8 @@
         "creating": "CREATING…",
         "beginner": "BEGINNER",
         "intermediate": "INTERMEDIATE",
-        "advanced": "ADVANCED"
+        "advanced": "ADVANCED",
+        "maxLevel": "MAX LEVEL"
     },
     "profile": {
         "dashboard": "Dashboard",
@@ -65,9 +80,14 @@
     "levels": {
         "sedentary": "Sedentary",
         "beginner": "Beginner",
+        "novice": "Novice",
         "intermediate": "Intermediate",
+        "dedicated": "Dedicated",
         "advanced": "Advanced",
-        "elite": "Elite"
+        "athlete": "Athlete",
+        "elite": "Elite",
+        "beast": "Beast",
+        "legend": "Legend"
     },
     "equipment": {
         "bodyweight": "No Equipment",
@@ -148,6 +168,26 @@
         "skipped": "Skipped",
         "inProgress": "In progress"
     },
+    "exercise": {
+        "eyebrow": "Exercise"
+    },
+    "muscles": {
+        "chest": "Chest",
+        "lats": "Lats",
+        "traps": "Traps",
+        "shoulders": "Shoulders",
+        "triceps": "Triceps",
+        "biceps": "Biceps",
+        "forearms": "Forearms",
+        "obliques": "Obliques",
+        "abs": "Abs",
+        "lower_back": "Lower Back",
+        "glutes": "Glutes",
+        "quads": "Quads",
+        "hamstrings": "Hamstrings",
+        "calves": "Calves",
+        "cardio_system": "Cardio"
+    },
     "session": {
         "workouts": "Workouts",
         "finish": "Finish",
@@ -165,5 +205,66 @@
         "cancel": "Cancel",
         "reps": "REPS",
         "kg": "KG"
+    },
+    "landing": {
+        "login": "Log In",
+        "badge": "Powered by AI",
+        "tagline": "Your personal trainer with artificial intelligence. Routines that adapt to you, not the other way around.",
+        "cta": "START FOR FREE",
+        "learnMore": "Learn more",
+        "featuresEyebrow": "Features",
+        "featuresTitle": "Everything you need to train smarter",
+        "feature1Title": "AI-Powered Routines",
+        "feature1Desc": "Our RAG system analyzes your profile and recommends personalized routines tailored to your goals and level.",
+        "feature2Title": "Plans Matched to Your Level",
+        "feature2Desc": "From beginner to elite. AI calibrates intensity, volume, and exercises based on your real experience.",
+        "feature3Title": "Progress Tracking",
+        "feature3Desc": "Record every set, rep, and weight. Visualize your progress and never lose track of your training.",
+        "feature4Title": "Level & XP System",
+        "feature4Desc": "Earn experience with each completed session. Level up and unlock new challenges. Your progress, gamified.",
+        "howEyebrow": "How It Works",
+        "howTitle": "Start training in 3 steps",
+        "step1Title": "Create your profile",
+        "step1Desc": "Complete a quick onboarding: your goal, experience level, available equipment, and body metrics.",
+        "step2Title": "AI generates your plan",
+        "step2Desc": "Our AI engine analyzes your profile against an exercise database and creates custom training modules.",
+        "step3Title": "Train and level up",
+        "step3Desc": "Log your sessions, earn XP for each completed workout, and watch yourself evolve week by week.",
+        "ctaTitle": "Ready to train smarter?",
+        "ctaDesc": "Join GYM-AI and let artificial intelligence power your training. Free, no commitment.",
+        "footerMade": "Made with ❤️ and protein in Colombia",
+        "footerRights": "All rights reserved.",
+        "mockWelcome": "Welcome back",
+        "mockProgress": "Weekly Progress",
+        "mockModule1": "Chest & Triceps — Strength",
+        "mockModule1Detail": "6 exercises · 45 min",
+        "mockModule2": "Full Leg Day — Hypertrophy",
+        "mockModule2Detail": "4 exercises · 30 min",
+        "mockStart": "START"
+    },
+    "summary": {
+        "backToLog": "Training Log",
+        "completed": "Completed",
+        "duration": "Duration",
+        "difficulty": "Difficulty",
+        "totalSets": "Total sets",
+        "set": "SET",
+        "kg": "KG",
+        "reps": "REPS"
+    },
+    "newWorkout": {
+        "back": "Back",
+        "title": "New Session",
+        "subtitle": "Name your workout, then start tracking sets.",
+        "nameLabel": "Workout Name",
+        "namePlaceholder": "e.g. Push Day A",
+        "quickPick": "Quick Pick",
+        "start": "Start Session →",
+        "pushDay": "Push Day A",
+        "pullDay": "Pull Day B",
+        "legDay": "Leg Day",
+        "upperBody": "Upper Body",
+        "fullBody": "Full Body",
+        "cardio": "Cardio"
     }
 }

@@ -6,7 +6,7 @@
  *
  * Data flow:
  *   User submits form → calls Supabase Auth (signInWithPassword / signUp)
- *   → on success: router.push("/") redirects to the protected dashboard
+ *   → on success: router.push("/dashboard") redirects to the protected dashboard
  *   → on error: shows inline error message
  *
  * The actual session cookie is written by Supabase's SSR helper
@@ -14,9 +14,12 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Cpu, Mail, Lock, User, ArrowRight, Loader2 } from "lucide-react";
+import { Cpu, Mail, Lock, User, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslation } from "@/i18n";
+import LocaleToggle from "@/components/ui/LocaleToggle";
 
 // Which tab is active
 type AuthMode = "login" | "signup";
@@ -24,6 +27,7 @@ type AuthMode = "login" | "signup";
 export default function LoginPage() {
     const router = useRouter();
     const supabase = createClient();
+    const { t } = useTranslation();
 
     const [mode, setMode] = useState<AuthMode>("login");
     const [email, setEmail] = useState("");
@@ -50,7 +54,7 @@ export default function LoginPage() {
 
                 if (signInError) throw signInError;
                 // Session cookie is set; redirect to dashboard
-                router.push("/");
+                router.push("/dashboard");
                 router.refresh(); // forces Next.js to re-run Server Components with the new session
             } else {
                 // ── Sign Up ────────────────────────────────────────────
@@ -71,11 +75,9 @@ export default function LoginPage() {
                 // If email confirmation is ENABLED, session is null — show the email prompt.
                 if (signUpData.session) {
                     router.refresh();
-                    router.push("/"); // page.tsx will detect goal=null → redirect to /onboarding
+                    router.push("/dashboard"); // dashboard/page.tsx will detect goal=null → redirect to /onboarding
                 } else {
-                    setSuccessMsg(
-                        "Account created! Check your email to confirm your address, then log in."
-                    );
+                    setSuccessMsg(t("auth.signupSuccess"));
                     setMode("login");
                 }
             }
@@ -83,7 +85,7 @@ export default function LoginPage() {
             if (err instanceof Error) {
                 setError(err.message);
             } else {
-                setError("An unexpected error occurred.");
+                setError(t("auth.unexpectedError"));
             }
         } finally {
             setLoading(false);
@@ -97,18 +99,30 @@ export default function LoginPage() {
             transition={{ duration: 0.5, ease: "easeOut" }}
             className="w-full max-w-sm"
         >
-            {/* ── Logo / Header ─────────────────────────────────────── */}
-            <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
+            {/* ── Top bar: Back link + Locale Toggle ─────────────── */}
+            <div className="flex items-center justify-between mb-6">
+                <Link
+                    href="/"
+                    className="flex items-center gap-1.5 text-xs text-white/20 hover:text-white/50 transition-colors"
+                >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>{t("auth.back")}</span>
+                </Link>
+                <LocaleToggle />
+            </div>
+
+            {/* ── Logo / Header (clickable → landing) ─────────────── */}
+            <Link href="/" className="block text-center mb-8 group">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 transition-all group-hover:shadow-[0_0_20px_rgba(57,255,20,0.15)]"
                     style={{ background: "rgba(57,255,20,0.08)", border: "1px solid rgba(57,255,20,0.2)" }}>
                     <Cpu className="w-7 h-7" style={{ color: "#39ff14" }} />
                 </div>
                 <h1 className="text-2xl font-bold tracking-tight text-white">GYM-AI</h1>
                 <p className="text-xs tracking-[0.25em] uppercase mt-1"
                     style={{ color: "rgba(255,255,255,0.35)" }}>
-                    Underground Tech Fitness
+                    {t("auth.subtitle")}
                 </p>
-            </div>
+            </Link>
 
             {/* ── Card ──────────────────────────────────────────────── */}
             <div
@@ -135,7 +149,7 @@ export default function LoginPage() {
                                     : { color: "rgba(255,255,255,0.4)" }
                             }
                         >
-                            {tab === "login" ? "Log In" : "Sign Up"}
+                            {tab === "login" ? t("auth.logIn") : t("auth.signUp")}
                         </button>
                     ))}
                 </div>
@@ -154,7 +168,7 @@ export default function LoginPage() {
                                 <InputField
                                     id="auth-username"
                                     type="text"
-                                    placeholder="Username"
+                                    placeholder={t("auth.usernamePlaceholder")}
                                     value={username}
                                     onChange={setUsername}
                                     icon={<User className="w-4 h-4" />}
@@ -167,7 +181,7 @@ export default function LoginPage() {
                     <InputField
                         id="auth-email"
                         type="email"
-                        placeholder="Email"
+                        placeholder={t("auth.emailPlaceholder")}
                         value={email}
                         onChange={setEmail}
                         icon={<Mail className="w-4 h-4" />}
@@ -177,7 +191,7 @@ export default function LoginPage() {
                     <InputField
                         id="auth-password"
                         type="password"
-                        placeholder="Password"
+                        placeholder={t("auth.passwordPlaceholder")}
                         value={password}
                         onChange={setPassword}
                         icon={<Lock className="w-4 h-4" />}
@@ -223,7 +237,7 @@ export default function LoginPage() {
                             <Loader2 className="w-4 h-4 animate-spin" />
                         ) : (
                             <>
-                                {mode === "login" ? "ACCESS SYSTEM" : "INITIALIZE PROTOCOL"}
+                                {mode === "login" ? t("auth.loginSubmit") : t("auth.signupSubmit")}
                                 <ArrowRight className="w-4 h-4" />
                             </>
                         )}
@@ -232,7 +246,7 @@ export default function LoginPage() {
             </div>
 
             <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
-                Secured by Supabase Auth · RLS enabled
+                {t("auth.securedBy")}
             </p>
         </motion.div>
     );

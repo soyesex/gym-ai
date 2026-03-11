@@ -22,7 +22,7 @@ import { useTranslation } from "@/i18n";
 
 /** Standard nav items (displayed around the FAB) */
 const leftItems = [
-    { href: "/", labelKey: "nav.home", icon: Home },
+    { href: "/dashboard", labelKey: "nav.home", icon: Home },
     { href: "/workouts", labelKey: "nav.library", icon: Dumbbell },
 ];
 
@@ -40,7 +40,7 @@ export default function BottomNav() {
      * "/" needs exact match; other routes use prefix matching.
      */
     const isActive = (href: string) =>
-        href === "/" ? pathname === "/" : pathname.startsWith(href);
+        pathname === href || pathname.startsWith(href + "/");
 
     return (
         <nav
