@@ -188,6 +188,21 @@
         "calves": "Calves",
         "cardio_system": "Cardio"
     },
+    "mechanics": {
+        "compound": "Compound",
+        "isolation": "Isolation"
+    },
+    "equipmentTypes": {
+        "bodyweight": "Bodyweight",
+        "dumbbell": "Dumbbell",
+        "barbell": "Barbell",
+        "kettlebell": "Kettlebell",
+        "cable": "Cable",
+        "machine": "Machine",
+        "band": "Band",
+        "smith_machine": "Smith Machine",
+        "ez_bar": "EZ Bar"
+    },
     "session": {
         "workouts": "Workouts",
         "finish": "Finish",
@@ -266,5 +281,11 @@
         "upperBody": "Upper Body",
         "fullBody": "Full Body",
         "cardio": "Cardio"
+    },
+    "pwa": {
+        "title": "Install Gym-AI",
+        "iosDesc": "Tap the share icon and then 'Add to Home Screen' to access your routines with a single tap.",
+        "androidDesc": "Take us with you on your next workout by installing the app.",
+        "installBtn": "Install App"
     }
 }

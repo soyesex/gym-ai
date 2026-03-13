@@ -13,6 +13,7 @@ import type { WorkoutWithSets } from "@/lib/supabase/queries";
 import type { Locale } from "@/i18n";
 import en from "@/i18n/en.json";
 import es from "@/i18n/es.json";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 function getDict(locale: Locale) {
     return locale === "es" ? es : en;
@@ -141,6 +142,10 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                         ))}
                     </div>
                 ))}
+            </div>
+
+            <div className="px-5">
+                <InstallPrompt dict={dict.pwa} />
             </div>
 
             <BottomNav />

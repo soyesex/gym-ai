@@ -22,8 +22,13 @@ export const metadata: Metadata = {
     locale: "es_CO",
     siteName: "GYM-AI",
   },
+  appleWebApp: {
+    capable: true,
+    title: "Gym AI",
+    statusBarStyle: "black-translucent",
+  },
+  themeColor: '#000000',
 };
-
 export default async function RootLayout({
   children,
 }: Readonly<{

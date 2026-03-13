@@ -188,6 +188,21 @@
         "calves": "Pantorrillas",
         "cardio_system": "Cardio"
     },
+    "mechanics": {
+        "compound": "Compuesto",
+        "isolation": "Aislamiento"
+    },
+    "equipmentTypes": {
+        "bodyweight": "Peso Corporal",
+        "dumbbell": "Mancuerna",
+        "barbell": "Barra",
+        "kettlebell": "Kettlebell",
+        "cable": "Cable",
+        "machine": "Máquina",
+        "band": "Banda",
+        "smith_machine": "Smith",
+        "ez_bar": "Barra EZ"
+    },
     "session": {
         "workouts": "Entrenamientos",
         "finish": "Finalizar",
@@ -266,5 +281,11 @@
         "upperBody": "Tren Superior",
         "fullBody": "Cuerpo Completo",
         "cardio": "Cardio"
+    },
+    "pwa": {
+        "title": "Instala Gym-AI",
+        "iosDesc": "Toca el ícono de compartir y luego 'Agregar a inicio' para acceder a tus rutinas con un solo toque.",
+        "androidDesc": "Llévanos siempre contigo en tu próximo entreno instalando la app.",
+        "installBtn": "Instalar App"
     }
 }
