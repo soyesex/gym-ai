@@ -361,7 +361,7 @@ function ExerciseGroup({ group, onChange, onBlur, onDelete, onAddSet }: Exercise
                         border: "1px solid rgba(57,255,20,0.2)",
                     }}
                 >
-                    {(group.exercise.primary_muscle ?? "unknown").replaceAll("_", " ")}
+                    {t(`muscles.${group.exercise.primary_muscle ?? "unknown"}`)}
                 </span>
             </div>
 
@@ -554,9 +554,9 @@ function ExercisePicker({
                                     <div className="flex-1 min-w-0">
                                         <p className="text-sm font-semibold text-white truncate">{getExerciseName(ex, locale)}</p>
                                         <p className="text-xs text-white/35 mt-0.5 capitalize">
-                                            {(ex.primary_muscle ?? "unknown").replaceAll("_", " ")} ·{" "}
-                                            {ex.mechanic ?? "—"} ·{" "}
-                                            {ex.equipment}
+                                            {t(`muscles.${ex.primary_muscle ?? "unknown"}`)} ·{" "}
+                                            {ex.mechanic ? t(`mechanics.${ex.mechanic}`) : "—"} ·{" "}
+                                            {t(`equipmentTypes.${ex.equipment}`)}
                                         </p>
                                     </div>
                                     <span
@@ -567,7 +567,7 @@ function ExercisePicker({
                                             border: "1px solid rgba(57,255,20,0.2)",
                                         }}
                                     >
-                                        {ex.difficulty}
+                                        {ex.difficulty ? t(`levels.${ex.difficulty}`) : ex.difficulty}
                                     </span>
                                 </button>
                             ))}

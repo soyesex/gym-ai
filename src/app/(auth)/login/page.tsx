@@ -203,6 +203,7 @@ export default function LoginPage() {
                     <AnimatePresence>
                         {error && (
                             <motion.p
+                                data-testid="auth-error"
                                 initial={{ opacity: 0, y: -4 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
@@ -214,6 +215,7 @@ export default function LoginPage() {
                         )}
                         {successMsg && (
                             <motion.p
+                                data-testid="auth-success"
                                 initial={{ opacity: 0, y: -4 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
