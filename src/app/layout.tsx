@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { I18nProvider, type Locale } from "@/i18n";
 import { cookies } from "next/headers";
+import { PWAProvider } from "@/components/pwa/PWAProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -27,7 +28,10 @@ export const metadata: Metadata = {
     title: "Gym AI",
     statusBarStyle: "black-translucent",
   },
-  themeColor: '#000000',
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
 };
 export default async function RootLayout({
   children,
@@ -41,6 +45,7 @@ export default async function RootLayout({
     <html lang={locale} className="dark">
       <body className={`${spaceGrotesk.variable} antialiased`}>
         <I18nProvider initialLocale={locale}>
+          <PWAProvider />
           {children}
         </I18nProvider>
       </body>

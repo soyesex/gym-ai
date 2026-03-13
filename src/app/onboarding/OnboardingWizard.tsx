@@ -108,6 +108,7 @@ export default function OnboardingWizard({ authName }: OnboardingWizardProps) {
     const [direction, setDirection] = useState(1);
     const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
     const [saving, setSaving] = useState(false);
+    const [isEntering, setIsEntering] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     function update<K extends keyof FormData>(key: K, value: FormData[K]) {
@@ -278,9 +279,11 @@ export default function OnboardingWizard({ authName }: OnboardingWizardProps) {
                             <StepComplete
                                 name={formData.full_name || authName || ""}
                                 onEnter={() => {
+                                    setIsEntering(true);
                                     router.push("/dashboard");
                                     router.refresh();
                                 }}
+                                isEntering={isEntering}
                             />
                         )}
                     </motion.div>
@@ -689,7 +692,7 @@ function StepSchedule({
 }
 
 // ── Step 7: Complete ───────────────────────────────────────────────────────────
-function StepComplete({ name, onEnter }: { name: string; onEnter: () => void }) {
+function StepComplete({ name, onEnter, isEntering }: { name: string; onEnter: () => void; isEntering: boolean }) {
     const { t } = useTranslation();
     return (
         <div className="pt-8 text-center">
@@ -711,7 +714,7 @@ function StepComplete({ name, onEnter }: { name: string; onEnter: () => void }) 
                     {t("onboarding.welcomeSystem")}{name ? `, ${name}` : ""}.
                 </p>
                 <p className="text-xs text-white/30 mb-10">{t("onboarding.aiCalibrated")}</p>
-                <NextButton onClick={onEnter} label={t("onboarding.enterSystem")} />
+                <NextButton onClick={onEnter} loading={isEntering} label={isEntering ? t("onboarding.initializing") : t("onboarding.enterSystem")} />
             </motion.div>
         </div>
     );

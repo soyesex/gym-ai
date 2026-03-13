@@ -37,12 +37,20 @@ export default function InstallPrompt({ dict }: InstallPromptProps) {
       if (!hasDismissed) {
         setShowPrompt(true);
       }
+    } else {
+      // Android / Desktop Chrome PWA fallback logic
+      const savedPrompt = (window as any).deferredPWAInstallPrompt;
+      if (savedPrompt && !hasDismissed) {
+        setDeferredPrompt(savedPrompt);
+        setShowPrompt(true);
+      }
     }
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
+      (window as any).deferredPWAInstallPrompt = e;
       setDeferredPrompt(e);
-      if (!hasDismissed) {
+      if (!hasDismissed && !isIosDevice) {
         setShowPrompt(true);
       }
     };

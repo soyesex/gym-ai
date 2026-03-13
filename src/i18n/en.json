@@ -17,7 +17,10 @@
         "signupSuccess": "Account created! Check your email to confirm your address, then log in.",
         "unexpectedError": "An unexpected error occurred.",
         "securedBy": "Secured by Supabase Auth · RLS enabled",
-        "back": "Back"
+        "back": "Back",
+        "usernameAvailable": "Username available",
+        "usernameTaken": "Username already taken",
+        "usernameCheckError": "Error checking username"
     },
     "home": {
         "welcomeBack": "Welcome back",
@@ -153,7 +156,8 @@
         "back": "Back",
         "next": "NEXT",
         "step": "Step",
-        "days": "days"
+        "days": "days",
+        "initializing": "Initializing..."
     },
     "log": {
         "trainingLog": "Training Log",

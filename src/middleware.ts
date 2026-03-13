@@ -73,8 +73,8 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // If logged in and trying to access an auth route → send to dashboard
-    if (user && isAuthRoute) {
+    // If logged in and trying to access an auth route or the landing page → send to dashboard
+    if (user && (isAuthRoute || pathname === "/")) {
         const homeUrl = request.nextUrl.clone();
         homeUrl.pathname = "/dashboard";
         return NextResponse.redirect(homeUrl);

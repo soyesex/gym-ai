@@ -17,10 +17,13 @@
         "signupSuccess": "¡Cuenta creada! Revisa tu correo para confirmar tu dirección, luego inicia sesión.",
         "unexpectedError": "Ocurrió un error inesperado.",
         "securedBy": "Protegido por Supabase Auth · RLS activado",
-        "back": "Volver"
+        "back": "Volver",
+        "usernameAvailable": "Nombre de usuario disponible",
+        "usernameTaken": "Nombre de usuario no disponible",
+        "usernameCheckError": "Error al verificar el nombre de usuario"
     },
     "home": {
-        "welcomeBack": "Bienvenido/a",
+        "welcomeBack": "Te damos la bienvenida",
         "trainingProtocol": "Protocolo de Entrenamiento",
         "level": "Nivel",
         "weeklyProgress": "Progreso Semanal",
@@ -122,7 +125,7 @@
         "gym_full": "Todas las máquinas disponibles"
     },
     "onboarding": {
-        "welcome": "Bienvenido",
+        "welcome": "Te damos la bienvenida",
         "letsBegin": "comencemos.",
         "whatCallYou": "¿Cómo deberíamos llamarte en el sistema?",
         "yourNameAlias": "Tu nombre o alias",
@@ -147,13 +150,14 @@
         "howOftenTrain": "¿Con qué frecuencia y por cuánto tiempo puedes entrenar?",
         "initializeProtocol": "INICIALIZAR PROTOCOLO",
         "protocolActive": "Protocolo Activo.",
-        "welcomeSystem": "Bienvenido al sistema",
+        "welcomeSystem": "Te damos la bienvenida al sistema",
         "aiCalibrated": "Tu IA de entrenamiento está calibrada y lista.",
         "enterSystem": "ENTRAR AL SISTEMA",
         "back": "Atrás",
         "next": "SIGUIENTE",
         "step": "Paso",
-        "days": "días"
+        "days": "días",
+        "initializing": "Calibrando IA..."
     },
     "log": {
         "trainingLog": "Registro de Entrenamiento",
@@ -249,7 +253,7 @@
         "ctaDesc": "Únete a GYM-AI y deja que la inteligencia artificial potencie tu entrenamiento. Sin costo, sin compromiso.",
         "footerMade": "Hecho con ❤️ y proteína en Colombia",
         "footerRights": "Todos los derechos reservados.",
-        "mockWelcome": "Bienvenido/a",
+        "mockWelcome": "Te damos la bienvenida",
         "mockProgress": "Progreso Semanal",
         "mockModule1": "Pecho & Tríceps — Fuerza",
         "mockModule1Detail": "6 ejercicios · 45 min",

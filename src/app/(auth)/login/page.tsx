@@ -212,10 +212,10 @@ export default function LoginPage() {
                                 {username.length > 0 && !isUsernameChecking && (
                                     <>
                                         {usernameCheckError ? (
-                                            <p className="text-xs mt-1.5 text-red-500">Error checking username</p>
+                                            <p className="text-xs mt-1.5 text-red-500">{t("auth.usernameCheckError")}</p>
                                         ) : typeof isUsernameAvailable === "boolean" ? (
                                             <p className={`text-xs mt-1.5 ${isUsernameAvailable ? "text-[#39ff14]" : "text-red-400"}`}>
-                                                {isUsernameAvailable ? "Username available" : "Username already taken"}
+                                                {isUsernameAvailable ? t("auth.usernameAvailable") : t("auth.usernameTaken")}
                                             </p>
                                         ) : null}
                                     </>
