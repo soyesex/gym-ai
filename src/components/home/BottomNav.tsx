@@ -35,12 +35,12 @@ export default function BottomNav() {
     const pathname = usePathname();
     const { t } = useTranslation();
 
-    /**
-     * Determines whether a nav item is active.
-     * "/" needs exact match; other routes use prefix matching.
-     */
-    const isActive = (href: string) =>
-        pathname === href || pathname.startsWith(href + "/");
+    const isActive = (href: string) => {
+        if (href === "/workouts") {
+            return pathname === href;
+        }
+        return pathname === href || pathname.startsWith(href + "/");
+    };
 
     return (
         <nav

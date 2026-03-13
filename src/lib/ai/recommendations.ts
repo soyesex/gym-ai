@@ -690,7 +690,7 @@ Rules:
             const exercises: RecommendedExercise[] = (matchedExercises as MatchedExerciseRow[]).map(
                 (ex) => ({
                     id: ex.id,
-                    name: ex.name,
+                    name: locale === "es" && ex.name_es ? ex.name_es : ex.name,
                     primaryMuscle: ex.primary_muscle as RecommendedExercise["primaryMuscle"],
                     sets: getSetsForGoal(context.goal, context.level),
                     reps: getRepsForGoal(context.goal, context.level),
