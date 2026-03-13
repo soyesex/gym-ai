@@ -101,7 +101,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
 
             if (result.success) {
                 // Navigate to the live workout session
-                router.push(`/workouts/${result.data.id}`);
+                router.push(`/session/${result.data.id}`);
             } else {
                 console.error("[HomeClient] Failed to start workout:", result.message);
                 // Reset loading so the user can try again
@@ -187,7 +187,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
                     className="mx-5 mb-4"
                 >
                     <Link
-                        href={`/workouts/${activeWorkout.id}`}
+                        href={`/session/${activeWorkout.id}`}
                         className="flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all hover:brightness-110"
                         style={{
                             background: "rgba(57,255,20,0.07)",

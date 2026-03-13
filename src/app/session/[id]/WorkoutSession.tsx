@@ -23,7 +23,7 @@ import {
     ArrowLeft, Plus, Trash2, Search, X,
     CheckCircle2, Loader2, ChevronDown,
 } from "lucide-react";
-import { addSet, updateSet, deleteSet, finishWorkout } from "@/app/workouts/actions";
+import { addSet, updateSet, deleteSet, finishWorkout, cancelWorkoutSession } from "@/app/workouts/actions";
 import BottomNav from "@/components/home/BottomNav";
 import type { WorkoutWithSets, SetWithExercise } from "@/lib/supabase/queries";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -202,6 +202,20 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
         }
     }
 
+    // ── Cancel ────────────────────────────────────────────────────────────────
+
+    async function handleCancel() {
+        const confirmed = window.confirm(t("session.cancelConfirmation") ?? "Are you sure you want to cancel this workout? All progress will be lost.");
+        if (!confirmed) return;
+        
+        const result = await cancelWorkoutSession(workout.id);
+        if (result.success) {
+            router.push("/log");
+        } else {
+            console.error("Failed to cancel workout.");
+        }
+    }
+
     // ── Render ────────────────────────────────────────────────────────────────
 
     return (
@@ -211,12 +225,21 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
         >
             {/* ── Header ── */}
             <div className="px-5 pt-12 pb-4">
-                <button
-                    onClick={() => router.push("/log")}
-                    className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-5 transition-colors"
-                >
-                    <ArrowLeft className="w-3.5 h-3.5" /> {t("session.workouts")}
-                </button>
+                <div className="flex items-center justify-between mb-5">
+                    <button
+                        onClick={() => router.push("/log")}
+                        className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
+                    >
+                        <ArrowLeft className="w-3.5 h-3.5" /> {t("session.workouts")}
+                    </button>
+
+                    <button
+                        onClick={handleCancel}
+                        className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-400 transition-colors font-semibold"
+                    >
+                        <Trash2 className="w-3.5 h-3.5" /> {t("session.cancelWorkout") ?? "Cancel Workout"}
+                    </button>
+                </div>
 
                 <div className="flex items-start justify-between">
                     <div>

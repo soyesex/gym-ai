@@ -121,7 +121,7 @@ export default function StatsClient({
                         {t("stats.personalBest")}
                     </p>
                     <Link
-                        href={`/workouts/${longestSession.id}`}
+                        href={`/session/${longestSession.id}`}
                         className="block rounded-2xl p-4 transition-all hover:brightness-105"
                         style={{ background: "#0a0a0a", border: "1px solid rgba(57,255,20,0.15)" }}
                     >
@@ -148,7 +148,7 @@ export default function StatsClient({
                         {recentSessions.map((w) => (
                             <Link
                                 key={w.id}
-                                href={`/workouts/${w.id}`}
+                                href={`/session/${w.id}`}
                                 className="flex items-center justify-between px-4 py-3 rounded-xl transition-all hover:bg-white/5"
                                 style={{ border: "1px solid rgba(255,255,255,0.05)", background: "#0a0a0a" }}
                             >

@@ -220,8 +220,10 @@
         "sessionTime": "Tiempo de sesión:",
         "howTough": "¿Qué tan duro fue?",
         "easy": "Fácil",
-        "maxEffort": "Esfuerzo Máximo",
+        "maxEffort": "Máximo Esfuerzo",
         "cancel": "Cancelar",
+        "cancelWorkout": "Cancelar Entrenamiento",
+        "cancelConfirmation": "¿Estás seguro de querer cancelar este entrenamiento? Todo tu progreso se perderá.",
         "reps": "REPS",
         "kg": "KG"
     },

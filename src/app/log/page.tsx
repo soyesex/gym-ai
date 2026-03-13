@@ -139,7 +139,7 @@ function WorkoutCard({ workout: w, dict, locale }: { workout: Workout; dict: typ
 
     return (
         <Link
-            href={`/workouts/${w.id}`}
+            href={`/session/${w.id}`}
             className="block rounded-2xl overflow-hidden transition-all hover:brightness-105"
             style={{ border: "1px solid rgba(255,255,255,0.06)", background: "#0a0a0a" }}
         >

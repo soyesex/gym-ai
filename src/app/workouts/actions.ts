@@ -201,12 +201,38 @@ export async function finishWorkout(
         return { success: false, message: error.message };
     }
 
-    // Invalidate both the session page and the workouts list
-    revalidatePath(`/workouts/${workoutId}`);
+    // Revalidate the workout session page
+    revalidatePath(`/session/${workoutId}`);
     revalidatePath("/workouts");
     revalidatePath("/log");     // refresh the Training Log page
     revalidatePath("/");        // refresh dashboard weekly stats + level
     revalidatePath("/profile"); // refresh profile page with updated XP/level
+    return { success: true, data: undefined };
+}
+
+/**
+ * Cancels an active workout session and deletes it completely.
+ */
+export async function cancelWorkoutSession(workoutId: string): Promise<ActionResult> {
+    const supabase = await createClient();
+    const userId = await getAuthUserId();
+    if (!userId) return { success: false, message: "Not authenticated." };
+
+    const { error } = await supabase
+        .from("workouts")
+        .delete()
+        .eq("id", workoutId)
+        .eq("user_id", userId);
+
+    if (error) {
+        console.error("[cancelWorkoutSession]", error.message);
+        return { success: false, message: error.message };
+    }
+
+    revalidatePath("/log");
+    revalidatePath("/");
+    
+    // We do not revalidate /session/[id] because it will be deleted and redirected.
     return { success: true, data: undefined };
 }
 
@@ -248,7 +274,7 @@ interface StartModulePayload {
  * Flow:
  *   1. INSERT a new `workouts` row (status = 'active')
  *   2. Bulk INSERT `workout_sets` for every set of every exercise
- *   3. Return the new workout id → client navigates to `/workouts/[id]`
+ *   3. Return the new workout id → client navigates to `/session/[id]`
  *
  * The `reps` string from the AI (e.g. "8-12") is parsed to a single number
  * by averaging the range bounds, which gives a sensible starting target.

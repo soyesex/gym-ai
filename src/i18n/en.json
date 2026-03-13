@@ -222,6 +222,8 @@
         "easy": "Easy",
         "maxEffort": "Max Effort",
         "cancel": "Cancel",
+        "cancelWorkout": "Cancel Workout",
+        "cancelConfirmation": "Are you sure you want to cancel this workout? All progress will be lost.",
         "reps": "REPS",
         "kg": "KG"
     },

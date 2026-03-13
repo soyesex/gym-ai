@@ -51,7 +51,7 @@ export default function NewWorkoutPage() {
         }
 
         // Navigate to the active session immediately
-        router.push(`/workouts/${result.data.id}`);
+        router.push(`/session/${result.data.id}`);
     }
 
     return (
