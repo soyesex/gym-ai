@@ -38,6 +38,7 @@ export default function LoginPage() {
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [isUsernameChecking, setIsUsernameChecking] = useState(false);
     const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+    const [usernameCheckError, setUsernameCheckError] = useState<boolean>(false);
 
     useEffect(() => {
         if (mode !== "signup" || !username) {
@@ -47,10 +48,22 @@ export default function LoginPage() {
         }
         
         setIsUsernameChecking(true);
+        setUsernameCheckError(false);
         const timeoutId = setTimeout(async () => {
-            const { data, error } = await supabase.rpc('is_username_available', { search_username: username });
-            if (!error && data !== null) {
+            const cleanUsername = username.trim().toLowerCase();
+            if (!cleanUsername) {
+                setIsUsernameAvailable(null);
+                setIsUsernameChecking(false);
+                return;
+            }
+
+            const { data, error } = await supabase.rpc('is_username_available', { search_username: cleanUsername });
+            if (error) {
+                setIsUsernameAvailable(null);
+                setUsernameCheckError(true);
+            } else if (data !== null) {
                 setIsUsernameAvailable(data);
+                setUsernameCheckError(false);
             }
             setIsUsernameChecking(false);
         }, 500);
@@ -79,13 +92,14 @@ export default function LoginPage() {
                 router.refresh(); // forces Next.js to re-run Server Components with the new session
             } else {
                 // ── Sign Up ────────────────────────────────────────────
+                const cleanUsername = username.trim().toLowerCase();
                 const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
                         // Pass extra metadata — stored in auth.users.raw_user_meta_data
                         // The DB trigger reads this to populate the profiles row.
-                        data: { username },
+                        data: { username: cleanUsername },
                     },
                 });
 
@@ -195,10 +209,16 @@ export default function LoginPage() {
                                     icon={<User className="w-4 h-4" />}
                                     required
                                 />
-                                {username.length > 0 && typeof isUsernameAvailable === "boolean" && !isUsernameChecking && (
-                                    <p className={`text-xs mt-1.5 ${isUsernameAvailable ? "text-[#39ff14]" : "text-red-400"}`}>
-                                        {isUsernameAvailable ? "Username available" : "Username already taken"}
-                                    </p>
+                                {username.length > 0 && !isUsernameChecking && (
+                                    <>
+                                        {usernameCheckError ? (
+                                            <p className="text-xs mt-1.5 text-red-500">Error checking username</p>
+                                        ) : typeof isUsernameAvailable === "boolean" ? (
+                                            <p className={`text-xs mt-1.5 ${isUsernameAvailable ? "text-[#39ff14]" : "text-red-400"}`}>
+                                                {isUsernameAvailable ? "Username available" : "Username already taken"}
+                                            </p>
+                                        ) : null}
+                                    </>
                                 )}
                             </motion.div>
                         )}
@@ -257,7 +277,7 @@ export default function LoginPage() {
                     <button
                         id="auth-submit"
                         type="submit"
-                        disabled={loading || (mode === "signup" && (isUsernameChecking || isUsernameAvailable === false))}
+                        disabled={loading || (mode === "signup" && (isUsernameChecking || isUsernameAvailable === false || usernameCheckError))}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold tracking-widest text-sm transition-opacity disabled:opacity-50"
                         style={{ background: "#39ff14", color: "#000" }}
                     >
