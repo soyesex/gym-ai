@@ -12,7 +12,7 @@
  * The actual session cookie is written by Supabase's SSR helper
  * via the middleware on the next request, so no manual cookie handling needed here.
  */
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -36,6 +36,27 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [isUsernameChecking, setIsUsernameChecking] = useState(false);
+    const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
+
+    useEffect(() => {
+        if (mode !== "signup" || !username) {
+            setIsUsernameAvailable(null);
+            setIsUsernameChecking(false);
+            return;
+        }
+        
+        setIsUsernameChecking(true);
+        const timeoutId = setTimeout(async () => {
+            const { data, error } = await supabase.rpc('is_username_available', { search_username: username });
+            if (!error && data !== null) {
+                setIsUsernameAvailable(data);
+            }
+            setIsUsernameChecking(false);
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+    }, [username, mode, supabase]);
 
     /** Handles both sign-in and sign-up in a single submit handler */
     async function handleSubmit(e: React.FormEvent) {
@@ -174,6 +195,11 @@ export default function LoginPage() {
                                     icon={<User className="w-4 h-4" />}
                                     required
                                 />
+                                {username.length > 0 && typeof isUsernameAvailable === "boolean" && !isUsernameChecking && (
+                                    <p className={`text-xs mt-1.5 ${isUsernameAvailable ? "text-[#39ff14]" : "text-red-400"}`}>
+                                        {isUsernameAvailable ? "Username available" : "Username already taken"}
+                                    </p>
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -231,7 +257,7 @@ export default function LoginPage() {
                     <button
                         id="auth-submit"
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || (mode === "signup" && (isUsernameChecking || isUsernameAvailable === false))}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold tracking-widest text-sm transition-opacity disabled:opacity-50"
                         style={{ background: "#39ff14", color: "#000" }}
                     >
