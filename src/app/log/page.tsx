@@ -62,7 +62,13 @@ export default async function TrainingLogPage() {
         redirect("/onboarding");
     }
 
-    const workouts = await getWorkouts();
+    let workouts: Workout[] = [];
+    try {
+        workouts = await getWorkouts();
+    } catch (err) {
+        console.error("[TrainingLogPage] Failed to fetch workouts:", err);
+        // Show empty state UI instead of crashing
+    }
 
     const cookieStore = await cookies();
     const locale = (cookieStore.get("gym-ai-locale")?.value ?? "en") as Locale;

@@ -15,10 +15,16 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
-    const [authUser, profile] = await Promise.all([
-        getAuthUser(),
-        getProfile(),
-    ]);
+    let authUser, profile;
+    try {
+        [authUser, profile] = await Promise.all([
+            getAuthUser(),
+            getProfile(),
+        ]);
+    } catch (err) {
+        console.error("[ProfilePage] Data fetch failed:", err);
+        throw new Error("Failed to load profile data");
+    }
 
     return (
         <ProfileClient

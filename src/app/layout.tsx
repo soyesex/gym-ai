@@ -3,6 +3,7 @@ import { Space_Grotesk } from "next/font/google";
 import { I18nProvider, type Locale } from "@/i18n";
 import { cookies } from "next/headers";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
+import { OfflineDetector } from "@/components/ui/OfflineDetector";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -45,6 +46,7 @@ export default async function RootLayout({
     <html lang={locale} className="dark">
       <body className={`${spaceGrotesk.variable} antialiased`}>
         <I18nProvider initialLocale={locale}>
+          <OfflineDetector />
           <PWAProvider />
           {children}
         </I18nProvider>

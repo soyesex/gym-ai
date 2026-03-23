@@ -27,10 +27,16 @@ export default async function ExerciseLibraryPage() {
     }
 
     // Fetch exercises and categories in parallel — they are independent queries
-    const [exercises, categories] = await Promise.all([
-        getExercises(),
-        getExerciseCategories(),
-    ]);
+    let exercises, categories;
+    try {
+        [exercises, categories] = await Promise.all([
+            getExercises(),
+            getExerciseCategories(),
+        ]);
+    } catch (err) {
+        console.error("[ExerciseLibraryPage] Data fetch failed:", err);
+        throw new Error("Failed to load exercise library data");
+    }
 
     return (
         <main

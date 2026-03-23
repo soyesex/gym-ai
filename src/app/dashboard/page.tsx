@@ -49,15 +49,23 @@ export default async function DashboardPage() {
     }
 
     // Returning user — fetch remaining data + AI recommendations in parallel.
-    // The AI call is wrapped in a catch so a Gemini failure never breaks the page.
-    const [weeklyStats, allWorkouts, recommendedModules] = await Promise.all([
-        getWeeklyWorkoutStats(),
-        getWorkouts(),
-        getRecommendedModules(authUser.id, locale).catch((err) => {
-            console.error("[DashboardPage] AI recommendations failed:", err);
-            return [];
-        }),
-    ]);
+    // Supabase failures are allowed to throw → caught by error.tsx boundary.
+    // The AI call is additionally wrapped in a catch so a Gemini failure never
+    // breaks the page even when Supabase is healthy.
+    let weeklyStats, allWorkouts, recommendedModules;
+    try {
+        [weeklyStats, allWorkouts, recommendedModules] = await Promise.all([
+            getWeeklyWorkoutStats(),
+            getWorkouts(),
+            getRecommendedModules(authUser.id, locale).catch((err) => {
+                console.error("[DashboardPage] AI recommendations failed:", err);
+                return [];
+            }),
+        ]);
+    } catch (err) {
+        console.error("[DashboardPage] Data fetch failed:", err);
+        throw new Error("Failed to load dashboard data");
+    }
 
     // Find any currently active session so the dashboard can show a "Resume" banner
     const activeWorkout = allWorkouts.find((w) => w.status === "active") ?? null;

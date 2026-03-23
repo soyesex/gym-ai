@@ -323,5 +323,40 @@
         "iosDesc": "Toca el ícono de compartir y luego 'Agregar a inicio' para acceder a tus rutinas con un solo toque.",
         "androidDesc": "Llévanos siempre contigo en tu próximo entreno instalando la app.",
         "installBtn": "Instalar App"
+    },
+    "error": {
+        "notFound": "Página no encontrada",
+        "notFoundDesc": "La página que buscas no existe o fue movida.",
+        "generic": "Algo salió mal",
+        "genericDesc": "Ocurrió un error inesperado. Inténtalo de nuevo.",
+        "retry": "Reintentar",
+        "goHome": "Ir al inicio",
+        "goBack": "Volver atrás",
+        "reload": "Recargar página",
+        "offline": "Sin conexión a internet",
+        "backOnline": "Conexión restaurada",
+        "retryAction": "Reintentar",
+        "sessionExpired": "Sesión expirada. Inicia sesión de nuevo.",
+        "forbidden": "No tienes permisos para acceder a esto.",
+        "tooManyRequests": "Demasiadas solicitudes. Espera un momento.",
+        "serverError": "Error del servidor. Intenta más tarde.",
+        "networkError": "Verifica tu conexión a internet.",
+        "timeout": "La solicitud tardó demasiado. Inténtalo de nuevo.",
+        "aiUnavailable": "El asistente IA está ocupado. Intenta en unos minutos.",
+        "aiTimeout": "La generación tardó demasiado.",
+        "aiGeneric": "No pudimos generar tu recomendación.",
+        "emptyState": "Nada aquí todavía",
+        "saveFailed": "No se pudo guardar. Tus datos están seguros — reintenta cuando vuelvas a tener conexión.",
+        "finishFailed": "No se pudo finalizar el entrenamiento. Inténtalo de nuevo.",
+        "deleteFailed": "No se pudo eliminar. Inténtalo de nuevo.",
+        "cancelFailed": "No se pudo cancelar el entrenamiento. Inténtalo de nuevo."
+    },
+    "loading": {
+        "msg1": "Montando las pesas...",
+        "msg2": "Calentando motores...",
+        "msg3": "Cargando hierro...",
+        "msg4": "Preparando tu sesión...",
+        "msg5": "Activando el modo bestia...",
+        "msg6": "Ajustando la barra..."
     }
 }

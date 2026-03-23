@@ -22,7 +22,13 @@ function formatDuration(seconds: number): string {
 }
 
 export default async function StatsPage() {
-    const workouts = await getWorkouts();
+    let workouts: Workout[];
+    try {
+        workouts = await getWorkouts();
+    } catch (err) {
+        console.error("[StatsPage] Data fetch failed:", err);
+        throw new Error("Failed to load stats data");
+    }
     const completed = workouts.filter((w) => w.status === "completed");
 
     // ── Aggregate calculations ─────────────────────────────────────────────────

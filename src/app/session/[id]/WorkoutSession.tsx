@@ -16,7 +16,7 @@
  *  passes them here as props. Local state mirrors the DB for instant UI,
  *  while Server Actions keep the DB in sync in the background.
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -102,9 +102,22 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
     const [finishing, setFinishing] = useState(false);
     const [difficulty, setDifficulty] = useState(7);
     const [searchQuery, setSearchQuery] = useState("");
+    const [errorToast, setErrorToast] = useState<string | null>(null);
+    const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const elapsed = useElapsedSeconds(workout.started_at);
     const grouped = groupSets(sets);
+
+    // ── Error toast helper ────────────────────────────────────────────────────
+    const showError = useCallback((key: string) => {
+        setErrorToast(key);
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setErrorToast(null), 5000);
+    }, []);
+
+    useEffect(() => {
+        return () => { if (toastTimerRef.current) clearTimeout(toastTimerRef.current); };
+    }, []);
 
     // ── Exercise picker logic ─────────────────────────────────────────────────
 
@@ -145,22 +158,30 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
 
         setSets((prev) => [...prev, optimistic]);
 
-        const result = await addSet(workout.id, exercise.id, {
-            weight_kg: 0,
-            reps: 0,
-            set_order: setOrder,
-        });
+        try {
+            const result = await addSet(workout.id, exercise.id, {
+                weight_kg: 0,
+                reps: 0,
+                set_order: setOrder,
+            });
 
-        if (result.success) {
-            // Replace temp row with real DB id
-            setSets((prev) =>
-                prev.map((s) =>
-                    s.id === tempId ? { ...s, id: result.data.id, pending: false } : s
-                )
-            );
-        } else {
-            // Roll back on failure
-            setSets((prev) => prev.filter((s) => s.id !== tempId));
+            if (result.success) {
+                // Replace temp row with real DB id
+                setSets((prev) =>
+                    prev.map((s) =>
+                        s.id === tempId ? { ...s, id: result.data.id, pending: false } : s
+                    )
+                );
+            } else {
+                // DB error — roll back but show message
+                setSets((prev) => prev.filter((s) => s.id !== tempId));
+                showError("error.saveFailed");
+            }
+        } catch (err) {
+            // Network failure — keep optimistic row visible (data preserved)
+            // but mark as pending so user knows it hasn't saved
+            console.error("[handlePickExercise] Network error:", err);
+            showError("error.saveFailed");
         }
     }
 
@@ -182,23 +203,46 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
         field: "weight_kg" | "reps",
         value: number
     ) {
-        // Persist on input blur — fire-and-forget (no loading state needed)
-        await updateSet(setId, workout.id, { [field]: value });
+        try {
+            // Persist on input blur — fire-and-forget (no loading state needed)
+            await updateSet(setId, workout.id, { [field]: value });
+        } catch (err) {
+            // Network failure — data is safe in local state, will need retry
+            console.error("[handleSetBlur] Network error:", err);
+            showError("error.saveFailed");
+        }
     }
 
     async function handleDeleteSet(setId: string) {
+        // Optimistically remove from UI
+        const previousSets = sets;
         setSets((prev) => prev.filter((s) => s.id !== setId));
-        await deleteSet(setId, workout.id);
+        try {
+            await deleteSet(setId, workout.id);
+        } catch (err) {
+            // Network failure — restore the set
+            console.error("[handleDeleteSet] Network error:", err);
+            setSets(previousSets);
+            showError("error.deleteFailed");
+        }
     }
 
     // ── Finish ────────────────────────────────────────────────────────────────
 
     async function handleFinish() {
         setFinishing(true);
-        const result = await finishWorkout(workout.id, elapsed, difficulty);
-        setFinishing(false);
-        if (result.success) {
-            router.push("/log");
+        try {
+            const result = await finishWorkout(workout.id, elapsed, difficulty);
+            setFinishing(false);
+            if (result.success) {
+                router.push("/log");
+            } else {
+                showError("error.finishFailed");
+            }
+        } catch (err) {
+            setFinishing(false);
+            console.error("[handleFinish] Network error:", err);
+            showError("error.finishFailed");
         }
     }
 
@@ -207,12 +251,17 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
     async function handleCancel() {
         const confirmed = window.confirm(t("session.cancelConfirmation") ?? "Are you sure you want to cancel this workout? All progress will be lost.");
         if (!confirmed) return;
-        
-        const result = await cancelWorkoutSession(workout.id);
-        if (result.success) {
-            router.push("/log");
-        } else {
-            console.error("Failed to cancel workout.");
+
+        try {
+            const result = await cancelWorkoutSession(workout.id);
+            if (result.success) {
+                router.push("/log");
+            } else {
+                showError("error.cancelFailed");
+            }
+        } catch (err) {
+            console.error("[handleCancel] Network error:", err);
+            showError("error.cancelFailed");
         }
     }
 
@@ -342,6 +391,34 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
                 onCancel={() => setShowFinish(false)}
                 onConfirm={handleFinish}
             />
+            {/* ── Error Toast ── */}
+            <AnimatePresence>
+                {errorToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        className="fixed bottom-20 left-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold"
+                        style={{
+                            background: "rgba(239,68,68,0.95)",
+                            color: "#fff",
+                            maxWidth: 440,
+                            margin: "0 auto",
+                            backdropFilter: "blur(8px)",
+                            boxShadow: "0 4px 24px rgba(0,0,0,0.5)",
+                        }}
+                    >
+                        <span className="flex-1">{t(errorToast)}</span>
+                        <button
+                            onClick={() => setErrorToast(null)}
+                            className="text-white/70 hover:text-white"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* ── BottomNav — always visible so user can navigate away */}
             <BottomNav />
         </div>

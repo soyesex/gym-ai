@@ -119,8 +119,9 @@ export async function checkHIBP(
         }
 
         return { valid: true };
-    } catch {
-        // Network error, timeout, etc. — fail-open
+    } catch (err) {
+        // Network error, timeout, etc. — fail-open but log for awareness
+        console.error("[checkHIBP] HIBP API unreachable, allowing password (fail-open):", err);
         return { valid: true };
     }
 }

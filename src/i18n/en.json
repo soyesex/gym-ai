@@ -323,5 +323,40 @@
         "iosDesc": "Tap the share icon and then 'Add to Home Screen' to access your routines with a single tap.",
         "androidDesc": "Take us with you on your next workout by installing the app.",
         "installBtn": "Install App"
+    },
+    "error": {
+        "notFound": "Page not found",
+        "notFoundDesc": "The page you're looking for doesn't exist or has been moved.",
+        "generic": "Something went wrong",
+        "genericDesc": "An unexpected error occurred. Please try again.",
+        "retry": "Try again",
+        "goHome": "Go home",
+        "goBack": "Go back",
+        "reload": "Reload page",
+        "offline": "No internet connection",
+        "backOnline": "Connection restored",
+        "retryAction": "Retry",
+        "sessionExpired": "Session expired. Please log in again.",
+        "forbidden": "You don't have permission to access this.",
+        "tooManyRequests": "Too many requests. Wait a moment.",
+        "serverError": "Server error. Try again later.",
+        "networkError": "Check your internet connection.",
+        "timeout": "Request took too long. Try again.",
+        "aiUnavailable": "AI assistant is busy. Try again in a few minutes.",
+        "aiTimeout": "Generation took too long.",
+        "aiGeneric": "We couldn't generate your recommendation.",
+        "emptyState": "Nothing here yet",
+        "saveFailed": "Could not save. Your data is safe — retry when back online.",
+        "finishFailed": "Could not finish workout. Try again.",
+        "deleteFailed": "Could not delete. Try again.",
+        "cancelFailed": "Could not cancel workout. Try again."
+    },
+    "loading": {
+        "msg1": "Racking the weights...",
+        "msg2": "Warming up...",
+        "msg3": "Loading iron...",
+        "msg4": "Prepping your session...",
+        "msg5": "Activating beast mode...",
+        "msg6": "Adjusting the bar..."
     }
 }
