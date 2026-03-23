@@ -13,13 +13,14 @@
  * via the middleware on the next request, so no manual cookie handling needed here.
  */
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cpu, Mail, Lock, User, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from "@/i18n";
 import LocaleToggle from "@/components/ui/LocaleToggle";
+import PasswordChecklist from "@/components/ui/PasswordChecklist";
 
 // Which tab is active
 type AuthMode = "login" | "signup";
@@ -34,11 +35,27 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [isUsernameChecking, setIsUsernameChecking] = useState(false);
     const [isUsernameAvailable, setIsUsernameAvailable] = useState<boolean | null>(null);
     const [usernameCheckError, setUsernameCheckError] = useState<boolean>(false);
+    const searchParams = useSearchParams();
+
+    // ── Read OAuth error from query params on mount ───────────────────
+    useEffect(() => {
+        const errorParam = searchParams.get("error");
+        if (errorParam === "cancelled") {
+            setError(t("auth.oauthCancelled"));
+        } else if (errorParam === "oauth_error") {
+            setError(t("auth.oauthError"));
+        }
+        // Clean URL without triggering a navigation
+        if (errorParam) {
+            window.history.replaceState({}, "", "/login");
+        }
+    }, [searchParams, t]);
 
     useEffect(() => {
         if (mode !== "signup" || !username) {
@@ -91,26 +108,35 @@ export default function LoginPage() {
                 router.push("/dashboard");
                 router.refresh(); // forces Next.js to re-run Server Components with the new session
             } else {
-                // ── Sign Up ────────────────────────────────────────────
+                // ── Sign Up (via server-side API route with HIBP validation) ──
                 const cleanUsername = username.trim().toLowerCase();
-                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: {
-                        // Pass extra metadata — stored in auth.users.raw_user_meta_data
-                        // The DB trigger reads this to populate the profiles row.
-                        data: { username: cleanUsername },
-                    },
+                const res = await fetch("/api/auth/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                        username: cleanUsername,
+                    }),
                 });
 
-                if (signUpError) throw signUpError;
+                const data = await res.json();
+
+                if (!res.ok) {
+                    // data.error is an i18n key (e.g., "auth.passwordBreached")
+                    // or a raw Supabase error message
+                    const errorKey = data.error;
+                    const translated = t(errorKey);
+                    // If t() returns the key itself, it's a raw message — show as-is
+                    throw new Error(translated !== errorKey ? translated : errorKey);
+                }
 
                 // If email confirmation is DISABLED in Supabase (dev mode),
                 // signUp returns a live session immediately — redirect to onboarding.
-                // If email confirmation is ENABLED, session is null — show the email prompt.
-                if (signUpData.session) {
+                // If email confirmation is ENABLED, session is false — show the email prompt.
+                if (data.session) {
                     router.refresh();
-                    router.push("/dashboard"); // dashboard/page.tsx will detect goal=null → redirect to /onboarding
+                    router.push("/dashboard");
                 } else {
                     setSuccessMsg(t("auth.signupSuccess"));
                     setMode("login");
@@ -245,6 +271,9 @@ export default function LoginPage() {
                         minLength={8}
                     />
 
+                    {/* Password strength checklist — sign-up mode only */}
+                    {mode === "signup" && <PasswordChecklist password={password} />}
+
                     {/* Error / Success feedback */}
                     <AnimatePresence>
                         {error && (
@@ -291,9 +320,71 @@ export default function LoginPage() {
                         )}
                     </button>
                 </form>
+
+                {/* ── "or" divider ──────────────────────────────────── */}
+                <div className="flex items-center gap-3 my-5">
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                    <span className="text-xs uppercase tracking-widest" style={{ color: "rgba(255,255,255,0.25)" }}>
+                        {t("auth.orDivider")}
+                    </span>
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                </div>
+
+                {/* ── Google OAuth button ───────────────────────────── */}
+                <button
+                    id="auth-google"
+                    type="button"
+                    disabled={googleLoading || loading}
+                    onClick={async () => {
+                        setGoogleLoading(true);
+                        setError(null);
+                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+                        await supabase.auth.signInWithOAuth({
+                            provider: "google",
+                            options: {
+                                redirectTo: `${siteUrl}/auth/callback`,
+                            },
+                        });
+                    }}
+                    className="w-full flex items-center justify-center gap-3 py-3 rounded-xl font-semibold text-sm transition-all hover:brightness-110 disabled:opacity-50"
+                    style={{
+                        background: "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "#fff",
+                    }}
+                >
+                    {googleLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                        <>
+                            <GoogleIcon />
+                            {t("auth.continueWithGoogle")}
+                        </>
+                    )}
+                </button>
             </div>
 
-            <p className="text-center text-xs mt-6" style={{ color: "rgba(255,255,255,0.2)" }}>
+            {/* ── Forgot password link (login mode only) ───────────── */}
+            <AnimatePresence>
+                {mode === "login" && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="text-center mt-4"
+                    >
+                        <Link
+                            href="/forgot-password"
+                            className="text-xs transition-colors hover:underline"
+                            style={{ color: "rgba(255,255,255,0.35)" }}
+                        >
+                            {t("auth.forgotPassword")}
+                        </Link>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <p className="text-center text-xs mt-4" style={{ color: "rgba(255,255,255,0.2)" }}>
                 {t("auth.securedBy")}
             </p>
         </motion.div>
@@ -335,5 +426,18 @@ function InputField({ id, type, placeholder, value, onChange, icon, required, mi
                 className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-white/25"
             />
         </div>
+    );
+}
+
+// ── Google icon SVG (official colors) ────────────────────────────────────────
+
+function GoogleIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.09 24.09 0 0 0 0 21.56l7.98-6.19z" />
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+        </svg>
     );
 }

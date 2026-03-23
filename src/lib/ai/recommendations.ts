@@ -573,7 +573,7 @@ Generate exactly ${MODULES_TO_GENERATE} training modules. Each module should be 
 Return a JSON array with this exact structure:
 [
   {
-    "title": "MODULE NAME IN UPPERCASE",
+    "title": "<EL NOMBRE DEL MÓDULO GENERADO ESTRICTAMENTE EN EL IDIOMA SOLICITADO>",
     "difficulty": "Beginner" | "Intermediate" | "Advanced",
     "duration_minutes": <number between 20 and ${context.minutesPerSession}>,
     "match_percentage": <number between 80 and 99>,

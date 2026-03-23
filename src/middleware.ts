@@ -17,7 +17,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Routes that logged-in users should NOT see (auth pages)
-const AUTH_ROUTES = ["/login", "/signup"];
+const AUTH_ROUTES = ["/login", "/signup", "/forgot-password"];
+
+// Routes that should bypass auth guards entirely (OAuth callbacks, password reset)
+const PUBLIC_API_ROUTES = ["/auth/callback", "/auth/reset-password"];
 
 // Routes that REQUIRE authentication — exact or prefix (must be followed by "/" or end of string)
 // NOTE: "/" is intentionally NOT here — it serves the public landing page.
@@ -57,6 +60,12 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     const { pathname } = request.nextUrl;
+
+    // Public API routes (OAuth callback, password reset) — skip all guards
+    const isPublicApi = PUBLIC_API_ROUTES.some((route) =>
+        pathname === route || pathname.startsWith(route + "/")
+    );
+    if (isPublicApi) return supabaseResponse;
 
     // Segment-aware prefix match (avoids "/log" matching "/login")
     const isProtected = PROTECTED_ROUTES.some((route) =>

@@ -10,6 +10,7 @@
  */
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/i18n";
 import type { Locale } from "@/i18n";
 
@@ -20,6 +21,7 @@ const LOCALES: { value: Locale; label: string }[] = [
 
 export default function LocaleToggle() {
     const { locale, setLocale } = useTranslation();
+    const router = useRouter();
 
     return (
         <div
@@ -32,7 +34,10 @@ export default function LocaleToggle() {
                     <button
                         key={value}
                         id={`locale-toggle-${value}`}
-                        onClick={() => setLocale(value)}
+                        onClick={() => {
+                            setLocale(value);
+                            router.refresh();
+                        }}
                         className="relative px-2.5 py-1 text-[11px] font-bold tracking-wider rounded-md transition-colors"
                         style={{ color: isActive ? "#000" : "rgba(255,255,255,0.4)" }}
                     >

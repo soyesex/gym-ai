@@ -29,7 +29,7 @@ import type { Locale } from "@/i18n";
 export default async function DashboardPage() {
     // Read locale from cookie (set by I18nProvider on the client)
     const cookieStore = await cookies();
-    const locale = (cookieStore.get("gym-ai-locale")?.value ?? "en") as Locale;
+    const locale = (cookieStore.get("gym-ai-locale")?.value ?? "es") as Locale;
 
     // Fetch auth user + profile first to determine routing
     const [authUser, profile] = await Promise.all([
