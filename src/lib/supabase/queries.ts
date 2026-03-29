@@ -244,3 +244,73 @@ export async function getWorkoutWithSets(
 
     return workout;
 }
+
+// ── Exercise Detail ───────────────────────────────────────────────────────────
+
+/**
+ * UUID v4 regex for fast client-side validation before hitting Supabase.
+ * Prevents "invalid input syntax for type uuid" Postgres errors on bad URLs.
+ */
+const UUID_REGEX =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Fetches a single exercise by ID with ALL detail fields including
+ * new migration columns (steps, risks, detailed_tips, youtube_url, etc.).
+ *
+ * Root cause note: select("*") with the TypeScript-typed Supabase client
+ * only returns columns known to database.types.ts. Since the new columns
+ * were added via migration AFTER the types were generated, we use an
+ * explicit column list + any-cast to ensure they are always fetched.
+ *
+ * Returns `null` when:
+ *   - id is not a valid UUID (avoids Postgres parse error)
+ *   - Exercise does not exist
+ *   - Network / DB error (logged, not thrown)
+ *
+ * @param id - Raw exercise ID from the URL segment.
+ */
+// Verified columns from database.types.ts + migration 20260328_exercise_detail_fields.sql
+// IMPORTANT: "tips" does NOT exist. The correct columns are "detailed_tips" / "detailed_tips_es"
+// Do NOT add unlisted columns — Supabase returns 400 and the page shows 404.
+const EXERCISE_DETAIL_COLUMNS = [
+    "id", "name", "name_es",
+    "description", "description_es",
+    "primary_muscle", "difficulty", "force",
+    "ai_thumbnail_url", "embedding",
+    "created_at",
+    // ── Migration fields (20260328_exercise_detail_fields.sql) ───────────────
+    "steps", "steps_es",
+    "risks", "risks_es",
+    "detailed_tips", "detailed_tips_es",
+    "youtube_url",
+].join(", ");
+
+export async function getExerciseById(id: string): Promise<Tables<"exercises"> | null> {
+    if (!UUID_REGEX.test(id)) {
+        console.warn("[getExerciseById] Rejected non-UUID id:", id);
+        return null;
+    }
+
+    try {
+        const supabase = await createClient();
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data, error } = await (supabase as any)
+            .from("exercises")
+            .select(EXERCISE_DETAIL_COLUMNS)
+            .eq("id", id)
+            .maybeSingle();
+
+        if (error) {
+            console.error("[getExerciseById] Supabase error:", error.message);
+            return null;
+        }
+
+        return data as Tables<"exercises"> | null;
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error("[getExerciseById] Unexpected error:", message);
+        return null;
+    }
+}

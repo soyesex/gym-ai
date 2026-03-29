@@ -203,7 +203,37 @@
         "inProgress": "In progress"
     },
     "exercise": {
-        "eyebrow": "Exercise"
+        "eyebrow": "Exercise",
+        "back": "Back",
+        "howToDoIt": "How to do it",
+        "tips": "Execution tips",
+        "risks": "Common mistakes & risks",
+        "watchVideo": "Watch tutorial on YouTube",
+        "primaryMuscle": "Primary muscle",
+        "noSteps": "Detailed steps not available yet.",
+        "noTips": "Tips not available yet.",
+        "noRisks": "Risk information not available yet.",
+        "noVideo": "Video not available yet.",
+        "avoidHow": "How to avoid it",
+        "difficulty": {
+            "beginner": "Beginner",
+            "intermediate": "Intermediate",
+            "advanced": "Advanced",
+            "novice": "Novice",
+            "dedicated": "Dedicated",
+            "athlete": "Athlete",
+            "elite": "Elite"
+        },
+        "chat": {
+            "title": "Ask about {exercise}",
+            "welcome": "I'm your assistant for {exercise}. Ask me about technique, variations, or if you feel discomfort.",
+            "placeholder": "Type your question...",
+            "typing": "Thinking...",
+            "error": "Could not send. Try again.",
+            "rateLimit": "Message limit reached. Try again in a few minutes.",
+            "offline": "No connection. Your message will be sent when you're back online.",
+            "fab": "AI"
+        }
     },
     "muscles": {
         "chest": "Chest",

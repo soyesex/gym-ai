@@ -1,0 +1,7 @@
+{
+  // Silence VS Code's built-in CSS linter for Tailwind v4 at-rules.
+  // @theme, @custom-variant, @apply are valid Tailwind v4 syntax —
+  // VS Code's CSS language server doesn't know them, but they compile fine.
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore"
+}

@@ -33,6 +33,7 @@ import { useState, useMemo, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { Search, Dumbbell, ChevronDown, ChevronUp } from "lucide-react";
 import type { Tables } from "@/lib/supabase/database.types";
 import { useTranslation, getExerciseName } from "@/i18n";
@@ -319,6 +320,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
     const difficultyLabel = exercise.difficulty ? t(`levels.${exercise.difficulty}`) : null;
 
     return (
+        <Link href={`/exercises/${exercise.id}`} className="block">
         <motion.div
             variants={cardVariants}
             initial="hidden"
@@ -400,6 +402,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
                 </div>
             </div>
         </motion.div>
+        </Link>
     );
 }
 
