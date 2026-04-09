@@ -21,7 +21,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+// Helpers
 
 /** Standard return shape for every action */
 type ActionResult<T = void> =
@@ -34,7 +34,23 @@ async function getAuthUserId(): Promise<string | null> {
     return user?.id ?? null;
 }
 
-// ── Actions ────────────────────────────────────────────────────────────────────
+// Actions
+
+/** Counts how many active sessions the user currently has (max 2 allowed) */
+async function countActiveSessions(userId: string): Promise<number> {
+    const supabase = await createClient();
+    const { count, error } = await supabase
+        .from("workouts")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("status", "active");
+
+    if (error) {
+        console.error("[countActiveSessions]", error.message);
+        return 0; // Fail open — don't block workout creation over a count query error
+    }
+    return count ?? 0;
+}
 
 /**
  * Creates a new workout session with status = 'active'.
@@ -48,6 +64,12 @@ export async function createWorkout(
     const supabase = await createClient();
     const userId = await getAuthUserId();
     if (!userId) return { success: false, message: "Not authenticated." };
+
+    // Guard: max 2 active sessions
+    const activeCount = await countActiveSessions(userId);
+    if (activeCount >= 2) {
+        return { success: false, message: "max_active_sessions" };
+    }
 
     const { data, error } = await supabase
         .from("workouts")
@@ -236,7 +258,7 @@ export async function cancelWorkoutSession(workoutId: string): Promise<ActionRes
     return { success: true, data: undefined };
 }
 
-// ── Recommended Module → Live Workout ──────────────────────────────────────────
+// -- Recommended Module -> Live Workout 
 
 /**
  * Shape of a single exercise within a recommended module.
@@ -264,6 +286,8 @@ interface ModuleExercise {
 interface StartModulePayload {
     /** AI-generated title (becomes the workout name) */
     title: string;
+    /** AI-generated title in Spanish */
+    title_es?: string;
     /** Exercises with their prescription */
     exercises: ModuleExercise[];
 }
@@ -289,12 +313,19 @@ export async function startRecommendedWorkout(
     const userId = await getAuthUserId();
     if (!userId) return { success: false, message: "Not authenticated." };
 
-    // ── Step 1: Create the workout ────────────────────────────────────────
+    // Guard: max 2 active sessions
+    const activeCount = await countActiveSessions(userId);
+    if (activeCount >= 2) {
+        return { success: false, message: "max_active_sessions" };
+    }
+
+    // Step 1: Create the workout
     const { data: workout, error: workoutError } = await supabase
         .from("workouts")
         .insert({
             user_id: userId,
-            name: module.title.trim(),
+            name: (module.title || "Workout").trim(),
+            name_es: (module.title_es || module.title || "Entrenamiento").trim(),
             status: "active",
             started_at: new Date().toISOString(),
         })
@@ -308,7 +339,7 @@ export async function startRecommendedWorkout(
 
     const workoutId = workout.id;
 
-    // ── Step 2: Build bulk-insert array for workout_sets ──────────────────
+    // Step 2: Build bulk-insert array for workout_sets
     //
     // For each exercise we create N rows (one per set).
     // `set_order` is a global counter across all exercises so that the
@@ -338,7 +369,7 @@ export async function startRecommendedWorkout(
         return rows;
     });
 
-    // ── Step 3: Bulk INSERT sets ──────────────────────────────────────────
+    // Step 3: Bulk INSERT sets
     if (setRows.length > 0) {
         const { error: setsError } = await supabase
             .from("workout_sets")
@@ -362,7 +393,7 @@ export async function startRecommendedWorkout(
     return { success: true, data: { id: workoutId } };
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+// Helpers
 
 /**
  * Parses the AI-generated rep range string into a single integer.

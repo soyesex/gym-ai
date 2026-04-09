@@ -126,7 +126,7 @@ export function isProfileComplete(profile: Tables<"profiles"> | null): boolean {
 
 /** A workout_sets row enriched with the exercise name and primary muscle. */
 export type SetWithExercise = Tables<"workout_sets"> & {
-    exercises: Pick<Tables<"exercises">, "id" | "name" | "primary_muscle">;
+    exercises: Pick<Tables<"exercises">, "id" | "name" | "name_es" | "primary_muscle">;
 };
 
 /** A workout row with all its sets already joined. */
@@ -218,7 +218,7 @@ export async function getWorkoutWithSets(
             *,
             sets:workout_sets (
                 *,
-                exercises ( id, name, primary_muscle )
+                exercises ( id, name, name_es, primary_muscle )
             )
         `)
         .eq("id", workoutId)

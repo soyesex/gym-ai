@@ -122,10 +122,10 @@ export default function ProfileClient({ authEmail, profile }: ProfileClientProps
             <div className="px-5 pt-12 pb-6">
                 {/* Back arrow */}
                 <button
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => router.back()}
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-6 transition-colors"
                 >
-                    <ArrowLeft className="w-3.5 h-3.5" /> {t("profile.dashboard")}
+                    <ArrowLeft className="w-3.5 h-3.5" /> {t("profile.back")}
                 </button>
 
                 <div className="flex items-center gap-4">

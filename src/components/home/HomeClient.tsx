@@ -9,14 +9,14 @@ import { useState } from "react";
  * Receives pre-fetched server data as props (profile, weeklyStats)
  * and handles all client-side concerns: logout, animations, user interactions.
  *
- * ┌───────────────────────────────────────────────────────────────┐
- * │ Sections (top → bottom):                                     │
- * │  1. Header — welcome + level badge + logout                  │
- * │  2. Resume Banner (if active workout exists)                 │
- * │  3. Training Protocol — weekly progress, XP, stats grid      │
- * │  4. Recommended Modules — AI-curated routine cards           │
- * │  5. BottomNav                                                │
- * └───────────────────────────────────────────────────────────────┘
+ * +-----------------------------------------------------------------+
+ * | Sections (top -> bottom):                                     |
+ * |  1. Header - welcome + level badge + logout                   |
+ * |  2. Resume Banner (if active workout exists)                  |
+ * |  3. Training Protocol - weekly progress, XP, stats grid       |
+ * |  4. Recommended Modules - AI-curated routine cards            |
+ * |  5. BottomNav                                                 |
+ * +-----------------------------------------------------------------+
  *
  * The Biometric Telemetry and Exercise Library sections were moved
  * to the Profile page as part of the product-strategy refactor.
@@ -33,6 +33,7 @@ import RecommendedModuleCard from "@/components/home/RecommendedModuleCard";
 import BottomNav from "@/components/home/BottomNav";
 import { createClient } from "@/lib/supabase/client";
 import { startRecommendedWorkout } from "@/app/workouts/actions";
+import { signOut as signOutAction } from "@/app/profile/actions";
 import type { Tables } from "@/lib/supabase/database.types";
 import type { RecommendedModule } from "@/lib/ai/types";
 
@@ -47,8 +48,8 @@ interface HomeClientProps {
     authEmail: string | null;
     profile: Tables<"profiles"> | null;
     weeklyStats: { completed: number; totalDurationSeconds: number };
-    /** The first workout with status='active', if any — drives the resume banner */
-    activeWorkout: Tables<"workouts"> | null;
+    /** Active workouts (up to 2) — drives the resume banners */
+    activeWorkouts: Tables<"workouts">[];
     /** AI-generated training modules from the RAG pipeline (may be empty) */
     recommendedModules: RecommendedModule[];
 }
@@ -61,18 +62,24 @@ const fadeUp = {
 
 
 
+/** Color themes for dual active sessions */
+const SESSION_COLORS = [
+    { accent: "#39ff14", bg: "rgba(57,255,20,0.07)", border: "rgba(57,255,20,0.35)" },
+    { accent: "#00d4ff", bg: "rgba(0,212,255,0.07)", border: "rgba(0,212,255,0.35)" },
+];
+
 // ---------------------------------------------------------------------------
 
-export default function HomeClient({ authEmail, profile, weeklyStats, activeWorkout, recommendedModules }: HomeClientProps) {
+export default function HomeClient({ authEmail, profile, weeklyStats, activeWorkouts, recommendedModules }: HomeClientProps) {
     const router = useRouter();
-    const { t } = useTranslation();
-    const supabase = createClient();
+    const { t, locale } = useTranslation();
 
     // Tracks which module card is currently being started (by module id)
     const [startingModuleId, setStartingModuleId] = useState<string | null>(null);
 
     async function handleLogout() {
-        await supabase.auth.signOut();
+        // We use the Server Action here because client-side signOut doesn't clear HTTP-only server cookies.
+        await signOutAction();
         router.push("/login");
         router.refresh();
     }
@@ -90,6 +97,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
             // Map from RecommendedModule to the server action's expected payload
             const result = await startRecommendedWorkout({
                 title: mod.name,
+                title_es: mod.name_es,
                 exercises: mod.exercises.map((ex) => ({
                     id: ex.id,
                     name: ex.name,
@@ -113,7 +121,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
         }
     }
 
-    // ── Derived display values ───────────────────────────────────────────────
+    // -- Derived display values --------------------------------------------------
 
     // Display name priority: full_name > username > email prefix > "Agent"
     const emailPrefix = authEmail?.split("@")[0] ?? null;
@@ -136,13 +144,13 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
     // Total training minutes this week
     const weeklyMinutes = Math.round(weeklyStats.totalDurationSeconds / 60);
 
-    // ── Render ───────────────────────────────────────────────────────────────
+    // -- Render ------------------------------------------------------------------
     return (
         <main
             className="min-h-screen pb-24"
             style={{ background: "#000", maxWidth: "480px", margin: "0 auto" }}
         >
-            {/* ── Header ────────────────────────────────────────── */}
+            {/* -- Header ---------------------------------------------- */}
             <motion.header
                 initial={{ opacity: 0, y: -16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -177,56 +185,60 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
                 </div>
             </motion.header>
 
-            {/* ── Resume Active Workout Banner ─────────────────────── */}
-            {activeWorkout && (
-                <motion.div
-                    variants={fadeUp}
-                    initial="hidden"
-                    animate="visible"
-                    transition={{ delay: 0.05, duration: 0.4, ease: "easeOut" }}
-                    className="mx-5 mb-4"
-                >
-                    <Link
-                        href={`/session/${activeWorkout.id}`}
-                        className="flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all hover:brightness-110"
-                        style={{
-                            background: "rgba(57,255,20,0.07)",
-                            border: "1.5px solid rgba(57,255,20,0.35)",
-                        }}
+            {/* -- Resume Active Workout Banners ----------------------- */}
+            {activeWorkouts.map((aw, idx) => {
+                const colors = SESSION_COLORS[idx] ?? SESSION_COLORS[0];
+                return (
+                    <motion.div
+                        key={aw.id}
+                        variants={fadeUp}
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ delay: 0.05 + idx * 0.08, duration: 0.4, ease: "easeOut" }}
+                        className="mx-5 mb-3"
                     >
-                        <div className="flex items-center gap-3">
-                            {/* Pulsing dot */}
-                            <span className="relative flex h-2.5 w-2.5">
-                                <span
-                                    className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                                    style={{ background: "#39ff14" }}
-                                />
-                                <span
-                                    className="relative inline-flex rounded-full h-2.5 w-2.5"
-                                    style={{ background: "#39ff14" }}
-                                />
-                            </span>
-                            <div>
-                                <p className="text-xs font-bold" style={{ color: "#39ff14" }}>
-                                    {t("home.activeSession")}
-                                </p>
-                                <p className="text-sm text-white font-semibold truncate max-w-[180px]">
-                                    {activeWorkout.name}
-                                </p>
-                            </div>
-                        </div>
-                        <div
-                            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl"
-                            style={{ background: "#39ff14", color: "#000" }}
+                        <Link
+                            href={`/session/${aw.id}`}
+                            className="flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all hover:brightness-110"
+                            style={{
+                                background: colors.bg,
+                                border: `1.5px solid ${colors.border}`,
+                            }}
                         >
-                            <Play className="w-3.5 h-3.5" />
-                            {t("home.resume")}
-                        </div>
-                    </Link>
-                </motion.div>
-            )}
+                            <div className="flex items-center gap-3 min-w-0">
+                                {/* Pulsing dot */}
+                                <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+                                    <span
+                                        className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                                        style={{ background: colors.accent }}
+                                    />
+                                    <span
+                                        className="relative inline-flex rounded-full h-2.5 w-2.5"
+                                        style={{ background: colors.accent }}
+                                    />
+                                </span>
+                                <div className="min-w-0">
+                                    <p className="text-xs font-bold" style={{ color: colors.accent }}>
+                                        {t("home.activeSession")}
+                                    </p>
+                                    <p className="text-sm text-white font-semibold truncate">
+                                        {locale === "es" && aw.name_es ? aw.name_es : aw.name}
+                                    </p>
+                                </div>
+                            </div>
+                            <div
+                                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-xl flex-shrink-0"
+                                style={{ background: colors.accent, color: "#000" }}
+                            >
+                                <Play className="w-3.5 h-3.5" />
+                                {t("home.resume")}
+                            </div>
+                        </Link>
+                    </motion.div>
+                );
+            })}
 
-            {/* ── Training Protocol Banner ───────────────────────── */}
+            {/* -- Training Protocol Banner -------------------------- */}
             <motion.section
                 variants={fadeUp}
                 initial="hidden"
@@ -247,7 +259,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
                                 {t("home.trainingProtocol")}
                             </p>
                             <h2 className="text-lg font-bold text-white">
-                                {t("home.level")} {level} · {levelLabel}
+                                {t("home.level")} {level} . {levelLabel}
                             </h2>
                         </div>
                         {/* XP badge — shows progress within current level */}
@@ -309,7 +321,7 @@ export default function HomeClient({ authEmail, profile, weeklyStats, activeWork
                 </div>
             </motion.section>
 
-            {/* ── Recommended Modules ─────────────────────────────── */}
+            {/* -- Recommended Modules ------------------------------- */}
             <motion.section
                 variants={fadeUp}
                 initial="hidden"

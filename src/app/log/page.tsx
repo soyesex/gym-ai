@@ -55,6 +55,12 @@ const STATUS_CONFIG: Record<
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
+/** Color themes matching HomeClient's dual-session coding */
+const SESSION_COLORS = [
+    { accent: "#39ff14", bg: "rgba(57,255,20,0.07)", border: "rgba(57,255,20,0.35)" },
+    { accent: "#00d4ff", bg: "rgba(0,212,255,0.07)", border: "rgba(0,212,255,0.35)" },
+];
+
 export default async function TrainingLogPage() {
     // Onboarding guard — redirect if profile is incomplete
     const profile = await getProfile();
@@ -73,6 +79,11 @@ export default async function TrainingLogPage() {
     const cookieStore = await cookies();
     const locale = (cookieStore.get("gym-ai-locale")?.value ?? "en") as Locale;
     const dict = getDict(locale);
+
+    // Build a map of active session IDs → their color index (0 or 1)
+    const activeWorkouts = workouts.filter((w) => w.status === "active");
+    const activeColorMap = new Map<string, number>();
+    activeWorkouts.forEach((w, i) => activeColorMap.set(w.id, Math.min(i, 1)));
 
     return (
         <main
@@ -99,12 +110,21 @@ export default async function TrainingLogPage() {
                 </Link>
             </div>
 
+
             {/* List */}
             <div className="px-5 space-y-3">
                 {workouts.length === 0 ? (
                     <EmptyState dict={dict} />
                 ) : (
-                    workouts.map((w) => <WorkoutCard key={w.id} workout={w} dict={dict} locale={locale} />)
+                    workouts.map((w) => (
+                        <WorkoutCard
+                            key={w.id}
+                            workout={w}
+                            dict={dict}
+                            locale={locale}
+                            activeColorIdx={activeColorMap.get(w.id) ?? -1}
+                        />
+                    ))
                 )}
             </div>
 
@@ -137,22 +157,30 @@ function EmptyState({ dict }: { dict: typeof en }) {
     );
 }
 
-function WorkoutCard({ workout: w, dict, locale }: { workout: Workout; dict: typeof en; locale: Locale }) {
+function WorkoutCard({ workout: w, dict, locale, activeColorIdx }: { workout: Workout; dict: typeof en; locale: Locale; activeColorIdx: number }) {
     const statusRaw = w.status ?? "active";
-    const statusCfg = STATUS_CONFIG[statusRaw];
-    const statusLabel = dict.log[statusRaw as keyof typeof dict.log] || statusCfg.label;
     const isActive = w.status === "active";
+    const colors = isActive && activeColorIdx >= 0 ? SESSION_COLORS[activeColorIdx] : null;
+    const statusCfg = colors
+        ? { label: "Active", color: colors.accent }
+        : STATUS_CONFIG[statusRaw];
+    const statusLabel = dict.log[statusRaw as keyof typeof dict.log] || statusCfg.label;
 
     return (
         <Link
             href={`/session/${w.id}`}
             className="block rounded-2xl overflow-hidden transition-all hover:brightness-105"
-            style={{ border: "1px solid rgba(255,255,255,0.06)", background: "#0a0a0a" }}
+            style={{
+                border: colors
+                    ? `1.5px solid ${colors.border}`
+                    : "1px solid rgba(255,255,255,0.06)",
+                background: colors ? colors.bg : "#0a0a0a",
+            }}
         >
             <div className="px-4 py-4">
                 {/* Name + status badge */}
                 <div className="flex items-start justify-between gap-2 mb-3">
-                    <p className="text-sm font-bold text-white leading-tight">{w.name}</p>
+                    <p className="text-sm font-bold text-white leading-tight truncate">{w.name}</p>
                     <span
                         className="flex-shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full"
                         style={{

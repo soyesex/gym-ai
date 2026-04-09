@@ -72,7 +72,9 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                     {dict.summary.completed}
                 </div>
 
-                <h1 className="text-2xl font-bold text-white mb-1">{workout.name}</h1>
+                <h1 className="text-2xl font-bold text-white mb-1">
+                    {locale === "es" && workout.name_es ? workout.name_es : workout.name}
+                </h1>
                 <p className="text-sm text-white/35">{formatDate(workout.started_at, locale)}</p>
 
                 {/* Stats row */}

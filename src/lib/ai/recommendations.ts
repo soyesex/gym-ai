@@ -192,7 +192,8 @@ async function callWithRetry<T>(
  * real exercises via pgvector in Steps C–D.
  */
 interface GeminiModuleSchema {
-    title: string;
+    title_en: string;
+    title_es: string;
     difficulty: "Beginner" | "Intermediate" | "Advanced";
     duration_minutes: number;
     match_percentage: number;
@@ -573,7 +574,8 @@ Generate exactly ${MODULES_TO_GENERATE} training modules. Each module should be 
 Return a JSON array with this exact structure:
 [
   {
-    "title": "<EL NOMBRE DEL MÓDULO GENERADO ESTRICTAMENTE EN EL IDIOMA SOLICITADO>",
+    "title_en": "<THE MODULE NAME IN ENGLISH>",
+    "title_es": "<EL NOMBRE DEL MÓDULO EN ESPAÑOL>",
     "difficulty": "Beginner" | "Intermediate" | "Advanced",
     "duration_minutes": <number between 20 and ${context.minutesPerSession}>,
     "match_percentage": <number between 80 and 99>,
@@ -582,7 +584,7 @@ Return a JSON array with this exact structure:
 ]
 
 Rules:
-- You MUST generate the "title" field in ${localeLabel}.
+- You MUST generate both "title_en" and "title_es" accurately.
 - The "search_query" field MUST be strictly in ENGLISH, as it will be used for vector matching against an English embedding database.
 - Difficulty should match the user's level (${context.level}).
 - match_percentage should reflect how well the module suits the user's goal.
@@ -636,7 +638,7 @@ Rules:
         const mod = geminiModules[i];
 
         try {
-            console.log(`[_generateFreshModules] Processing module ${i + 1}: "${mod.title}"`);
+            console.log(`[_generateFreshModules] Processing module ${i + 1}: "${mod.title_en}"`);
             console.log(`[_generateFreshModules]   search_query: "${mod.search_query}"`);
 
             // Delay between embedding calls to avoid rate limits
@@ -646,7 +648,7 @@ Rules:
 
             // Step C: Embed the search_query with retry logic.
             const queryEmbedding = await callWithRetry(
-                `embed module search_query "${mod.title}"`,
+                `embed module search_query "${mod.title_en}"`,
                 () => ai.models.embedContent({
                     model: EMBEDDING_MODEL,
                     contents: mod.search_query,
@@ -657,7 +659,7 @@ Rules:
             const queryVector = queryEmbedding.embeddings?.[0]?.values;
 
             if (!queryVector || queryVector.length === 0) {
-                console.warn(`[_generateFreshModules] Empty embedding for module "${mod.title}". Skipping.`);
+                console.warn(`[_generateFreshModules] Empty embedding for module "${mod.title_en}". Skipping.`);
                 continue;
             }
 
@@ -672,12 +674,12 @@ Rules:
                 });
 
             if (rpcError) {
-                console.error(`[_generateFreshModules] RPC error for module "${mod.title}":`, rpcError.message);
+                console.error(`[_generateFreshModules] RPC error for module "${mod.title_en}":`, rpcError.message);
                 continue;
             }
 
             if (!matchedExercises || matchedExercises.length === 0) {
-                console.warn(`[_generateFreshModules] No exercises matched for module "${mod.title}".`);
+                console.warn(`[_generateFreshModules] No exercises matched for module "${mod.title_en}".`);
                 continue;
             }
 
@@ -702,11 +704,12 @@ Rules:
 
             const module: RecommendedModule = {
                 id: `module-${i}-${Date.now()}`,
-                name: mod.title,
+                name: mod.title_en || "Daily Protocol",
+                name_es: mod.title_es || mod.title_en || "Protocolo Diario",
                 matchPercent: clamp(mod.match_percentage, 0, 100),
                 difficulty,
                 exerciseCount: exercises.length,
-                durationMin: mod.duration_minutes,
+                durationMin: mod.duration_minutes || 45,
                 gradient: DIFFICULTY_GRADIENTS[difficulty] ?? DIFFICULTY_GRADIENTS.Beginner,
                 exercises,
             };
@@ -714,11 +717,11 @@ Rules:
             assembledModules.push(module);
 
             console.log(
-                `[_generateFreshModules]   ✓ Module "${mod.title}" assembled with ${exercises.length} exercises.`
+                `[_generateFreshModules]   ✓ Module "${mod.title_en}" assembled with ${exercises.length} exercises.`
             );
         } catch (moduleError) {
             const message = moduleError instanceof Error ? moduleError.message : String(moduleError);
-            console.error(`[_generateFreshModules] Error processing module "${mod.title}":`, message);
+            console.error(`[_generateFreshModules] Error processing module "${mod.title_en}":`, message);
         }
     }
 

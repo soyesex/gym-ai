@@ -101,7 +101,8 @@
         "perSession": "Por sesión",
         "daysWeek": "Días / semana",
         "language": "Idioma",
-        "noUsernameSet": "sin usuario"
+        "noUsernameSet": "sin usuario",
+        "back": "Volver"
     },
     "goals": {
         "lose_fat": "Perder Grasa",
@@ -285,7 +286,13 @@
         "cancelWorkout": "Cancelar Entrenamiento",
         "cancelConfirmation": "¿Estás seguro de querer cancelar este entrenamiento? Todo tu progreso se perderá.",
         "reps": "REPS",
-        "kg": "KG"
+        "kg": "KG",
+        "back": "Volver",
+        "softCheck90Title": "¡Llevas 90 minutos dando todo!",
+        "softCheck90Desc": "Impresionante, pero tu sistema nervioso central podría necesitar un descanso. ¿Cerramos o vas por la leyenda hoy?",
+        "keepGoing": "Seguir 💪",
+        "wrapUp": "Cerrar Sesión",
+        "autoSavedToast": "¡Bienvenido de vuelta! Tu última sesión fue guardada automáticamente para mantener tus estadísticas precisas."
     },
     "landing": {
         "login": "Iniciar Sesión",
@@ -379,7 +386,8 @@
         "saveFailed": "No se pudo guardar. Tus datos están seguros — reintenta cuando vuelvas a tener conexión.",
         "finishFailed": "No se pudo finalizar el entrenamiento. Inténtalo de nuevo.",
         "deleteFailed": "No se pudo eliminar. Inténtalo de nuevo.",
-        "cancelFailed": "No se pudo cancelar el entrenamiento. Inténtalo de nuevo."
+        "cancelFailed": "No se pudo cancelar el entrenamiento. Inténtalo de nuevo.",
+        "maxActiveSessions": "Ya tienes 2 sesiones activas. Finaliza o cancela una primero."
     },
     "loading": {
         "msg1": "Montando las pesas...",

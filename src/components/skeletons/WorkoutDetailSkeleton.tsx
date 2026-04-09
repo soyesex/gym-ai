@@ -3,6 +3,7 @@
  * Skeleton placeholder for the workout session / detail view.
  * Mimics: header + exercise list with sets.
  */
+import LoadingStateMessage from "@/components/ui/LoadingStateMessage";
 
 export function WorkoutDetailSkeleton() {
     return (
@@ -77,6 +78,8 @@ export function WorkoutDetailSkeleton() {
                     ))}
                 </div>
             ))}
+
+            <LoadingStateMessage />
         </div>
     );
 }

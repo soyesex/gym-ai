@@ -28,6 +28,8 @@ export interface RecommendedRoutine {
     id: string;
     /** Routine display name (e.g. "DEADLIFT X-PROTOCOL") */
     name: string;
+    /** Routine display name in Spanish */
+    name_es: string;
     /** AI-calculated match percentage (0-100) */
     matchPercent: number;
     /** Difficulty tier */
@@ -77,7 +79,7 @@ export default function RecommendedModuleCard({
     isLoading = false,
 }: RecommendedModuleCardProps) {
     const diffStyle = DIFFICULTY_STYLES[routine.difficulty] ?? DIFFICULTY_STYLES.Beginner;
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
     const diffLabel = t(DIFFICULTY_KEYS[routine.difficulty] ?? "home.beginner");
 
     return (
@@ -89,13 +91,13 @@ export default function RecommendedModuleCard({
             className="relative w-full rounded-2xl overflow-hidden cursor-pointer group"
             style={{ border: "1px solid rgba(255,255,255,0.07)" }}
         >
-            {/* ── Gradient Background ────────────────────────────── */}
+            {/* -- Gradient Background -------------------------------- */}
             <div
                 className="absolute inset-0"
                 style={{ background: routine.gradient }}
             />
 
-            {/* ── Subtle animated shimmer overlay ────────────────── */}
+            {/* -- Subtle animated shimmer overlay ---------------------- */}
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                 style={{
@@ -104,7 +106,7 @@ export default function RecommendedModuleCard({
                 }}
             />
 
-            {/* ── Card Content ───────────────────────────────────── */}
+            {/* -- Card Content ------------------------------------------ */}
             <div className="relative z-10 flex flex-col justify-between p-5 min-h-[180px]">
                 {/* Top row: difficulty + match badge */}
                 <div className="flex items-start justify-between">
@@ -130,7 +132,7 @@ export default function RecommendedModuleCard({
                 <div className="mt-auto pt-4 space-y-3">
                     {/* Routine name */}
                     <h3 className="text-lg font-extrabold tracking-wide text-white leading-tight">
-                        {routine.name}
+                        {locale === "es" && routine.name_es ? routine.name_es : routine.name}
                     </h3>
 
                     {/* Meta row: exercises & duration */}

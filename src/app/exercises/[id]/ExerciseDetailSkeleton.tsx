@@ -9,6 +9,8 @@
  * CSS shimmer animation — no external dependencies.
  */
 
+import LoadingStateMessage from "@/components/ui/LoadingStateMessage";
+
 export default function ExerciseDetailSkeleton() {
     return (
         <div className="min-h-screen" style={{ background: "#000", maxWidth: "480px", margin: "0 auto" }}>
@@ -91,6 +93,8 @@ export default function ExerciseDetailSkeleton() {
             <div className="px-4 mt-6 mb-28">
                 <SkeletonBlock style={{ height: 56, borderRadius: 16 }} />
             </div>
+
+            <LoadingStateMessage />
         </div>
     );
 }

@@ -31,7 +31,7 @@ export default async function StatsPage() {
     }
     const completed = workouts.filter((w) => w.status === "completed");
 
-    // ── Aggregate calculations ─────────────────────────────────────────────────
+    // -- Aggregate calculations -------------------------------------------------
     const totalSessions = completed.length;
     const totalSeconds = completed.reduce((sum, w) => sum + (w.duration_seconds ?? 0), 0);
     const avgDifficulty = completed.length > 0
@@ -62,7 +62,7 @@ export default async function StatsPage() {
         }
     }
 
-    // ── Build props for the client component ───────────────────────────────────
+    // -- Build props for the client component -----------------------------
     // Icons are passed as string identifiers because React components can't
     // be serialized across the Server → Client boundary.
     const stats = [
@@ -76,18 +76,39 @@ export default async function StatsPage() {
         ? {
             id: longestSession.id,
             name: longestSession.name,
+            name_es: longestSession.name_es,
             startedAt: longestSession.started_at,
             durationFormatted: formatDuration(longestSession.duration_seconds ?? 0),
         }
         : null;
 
-    const recentSessions = completed.slice(0, 5).map((w) => ({
-        id: w.id,
-        name: w.name,
-        startedAt: w.started_at,
-        durationFormatted: formatDuration(w.duration_seconds ?? 0),
-        difficulty: w.subjective_difficulty,
-    }));
+    const recentSessions = [
+        // Active sessions first
+        ...workouts
+            .filter((w) => w.status === "active")
+            .slice(0, 2)
+            .map((w, i) => ({
+                id: w.id,
+                name: w.name,
+                name_es: w.name_es,
+                startedAt: w.started_at,
+                durationFormatted: "—",
+                difficulty: null as number | null,
+                status: "active" as const,
+                colorIdx: i,
+            })),
+        // Then recent completed
+        ...completed.slice(0, 5).map((w) => ({
+            id: w.id,
+            name: w.name,
+            name_es: w.name_es,
+            startedAt: w.started_at,
+            durationFormatted: formatDuration(w.duration_seconds ?? 0),
+            difficulty: w.subjective_difficulty,
+            status: "completed" as const,
+            colorIdx: -1,
+        })),
+    ];
 
     return (
         <StatsClient
@@ -95,6 +116,7 @@ export default async function StatsPage() {
             longestSession={longestSessionProp}
             recentSessions={recentSessions}
             hasCompletedSessions={completed.length > 0}
+            hasAnySessions={recentSessions.length > 0}
         />
     );
 }

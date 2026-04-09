@@ -105,6 +105,7 @@ export default function LoginPage() {
 
                 if (signInError) throw signInError;
                 // Session cookie is set; redirect to dashboard
+                document.cookie = "gym_ai_first_session=1; path=/";
                 router.push("/dashboard");
                 router.refresh(); // forces Next.js to re-run Server Components with the new session
             } else {
@@ -135,6 +136,7 @@ export default function LoginPage() {
                 // signUp returns a live session immediately — redirect to onboarding.
                 // If email confirmation is ENABLED, session is false — show the email prompt.
                 if (data.session) {
+                    document.cookie = "gym_ai_first_session=1; path=/";
                     router.refresh();
                     router.push("/dashboard");
                 } else {
@@ -338,6 +340,7 @@ export default function LoginPage() {
                     onClick={async () => {
                         setGoogleLoading(true);
                         setError(null);
+                        document.cookie = "gym_ai_first_session=1; path=/";
                         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
                         await supabase.auth.signInWithOAuth({
                             provider: "google",

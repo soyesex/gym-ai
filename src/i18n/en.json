@@ -101,7 +101,8 @@
         "perSession": "Per session",
         "daysWeek": "Days / week",
         "language": "Language",
-        "noUsernameSet": "no username set"
+        "noUsernameSet": "no username set",
+        "back": "Back"
     },
     "goals": {
         "lose_fat": "Lose Fat",
@@ -285,7 +286,13 @@
         "cancelWorkout": "Cancel Workout",
         "cancelConfirmation": "Are you sure you want to cancel this workout? All progress will be lost.",
         "reps": "REPS",
-        "kg": "KG"
+        "kg": "KG",
+        "back": "Back",
+        "softCheck90Title": "You've been grinding for 90 minutes!",
+        "softCheck90Desc": "I'm impressed, but your central nervous system might need a break. Should we wrap this up or are you aiming for legendary status today?",
+        "keepGoing": "Keep Going 💪",
+        "wrapUp": "Wrap It Up",
+        "autoSavedToast": "Welcome back! Your last session was auto-saved to keep your stats accurate."
     },
     "landing": {
         "login": "Log In",
@@ -379,7 +386,8 @@
         "saveFailed": "Could not save. Your data is safe — retry when back online.",
         "finishFailed": "Could not finish workout. Try again.",
         "deleteFailed": "Could not delete. Try again.",
-        "cancelFailed": "Could not cancel workout. Try again."
+        "cancelFailed": "Could not cancel workout. Try again.",
+        "maxActiveSessions": "You already have 2 active sessions. Finish or cancel one first."
     },
     "loading": {
         "msg1": "Racking the weights...",

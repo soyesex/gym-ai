@@ -22,7 +22,6 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import {
-    ArrowLeft,
     Dumbbell,
     ListOrdered,
     Lightbulb,
@@ -37,6 +36,7 @@ import en from "@/i18n/en.json";
 import es from "@/i18n/es.json";
 import LocaleToggle from "@/components/ui/LocaleToggle";
 import ExerciseChatFAB from "./ExerciseChatFAB";
+import BackButton from "@/components/ui/BackButton";
 import type React from "react";
 
 // ---------------------------------------------------------------------------
@@ -238,14 +238,7 @@ export default async function ExerciseDetailPage({
                     borderBottom: "1px solid rgba(255,255,255,0.06)",
                 }}
             >
-                <Link
-                    href="/workouts"
-                    className="flex items-center gap-1.5 text-sm font-medium transition-opacity hover:opacity-70"
-                    style={{ color: "#39ff14" }}
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span>{st("exercise.back", locale)}</span>
-                </Link>
+                <BackButton label={st("exercise.back", locale)} />
 
                 <span
                     className="text-sm font-bold tracking-widest uppercase"

@@ -24,6 +24,7 @@ import { cookies } from "next/headers";
 import { getAuthUser, getProfile, getWeeklyWorkoutStats, getWorkouts, isProfileComplete } from "@/lib/supabase/queries";
 import { getRecommendedModules } from "@/lib/ai/recommendations";
 import HomeClient from "@/components/home/HomeClient";
+import ClearFirstSessionCookie from "@/components/ui/ClearFirstSessionCookie";
 import type { Locale } from "@/i18n";
 
 export default async function DashboardPage() {
@@ -67,16 +68,19 @@ export default async function DashboardPage() {
         throw new Error("Failed to load dashboard data");
     }
 
-    // Find any currently active session so the dashboard can show a "Resume" banner
-    const activeWorkout = allWorkouts.find((w) => w.status === "active") ?? null;
+    // Find active sessions (up to 2) so the dashboard can show "Resume" banners
+    const activeWorkouts = allWorkouts.filter((w) => w.status === "active").slice(0, 2);
 
     return (
-        <HomeClient
-            authEmail={authUser.email ?? null}
-            profile={profile!}
-            weeklyStats={weeklyStats}
-            activeWorkout={activeWorkout}
-            recommendedModules={recommendedModules}
-        />
+        <>
+            <ClearFirstSessionCookie />
+            <HomeClient
+                authEmail={authUser.email ?? null}
+                profile={profile!}
+                weeklyStats={weeklyStats}
+                activeWorkouts={activeWorkouts}
+                recommendedModules={recommendedModules}
+            />
+        </>
     );
 }

@@ -135,6 +135,9 @@ export interface RecommendedModule {
     /** AI-generated routine name (e.g. "UPPER BODY FUNDAMENTALS") */
     name: string;
 
+    /** AI-generated routine name in Spanish */
+    name_es: string;
+
     /** AI-calculated match percentage (0-100) based on cosine similarity + profile fit */
     matchPercent: number;
 

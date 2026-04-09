@@ -15,7 +15,7 @@ import type { LucideIcon } from "lucide-react";
 import BottomNav from "@/components/home/BottomNav";
 import { useTranslation } from "@/i18n";
 
-// ── Icon map ───────────────────────────────────────────────────────────────────
+// Icon map
 
 /**
  * Maps string identifiers from the server to actual Lucide components.
@@ -29,7 +29,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
     Flame,
 };
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+// Types
 
 /** Pre-computed stat card data passed from the server */
 interface StatCard {
@@ -46,20 +46,31 @@ export interface StatsClientProps {
     longestSession: {
         id: string;
         name: string;
+        name_es?: string | null;
         startedAt: string | null;
         durationFormatted: string;
     } | null;
     recentSessions: {
         id: string;
         name: string;
+        name_es?: string | null;
         startedAt: string | null;
         durationFormatted: string;
         difficulty: number | null;
+        status: "active" | "completed";
+        colorIdx: number;
     }[];
     hasCompletedSessions: boolean;
+    hasAnySessions: boolean;
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────────
+/** Color themes for dual active sessions */
+const SESSION_COLORS = [
+    { accent: "#39ff14", bg: "rgba(57,255,20,0.03)", border: "rgba(57,255,20,0.25)" },
+    { accent: "#00d4ff", bg: "rgba(0,212,255,0.03)", border: "rgba(0,212,255,0.25)" },
+];
+
+// -- Helpers -----------------------------------------------------------------
 
 /** Formats an ISO date to a short locale-aware label */
 function formatDate(iso: string | null, locale: string): string {
@@ -70,13 +81,14 @@ function formatDate(iso: string | null, locale: string): string {
     );
 }
 
-// ── Component ──────────────────────────────────────────────────────────────────
+// -- Component ---------------------------------------------------------------
 
 export default function StatsClient({
     stats,
     longestSession,
     recentSessions,
     hasCompletedSessions,
+    hasAnySessions,
 }: StatsClientProps) {
     const { t, locale } = useTranslation();
 
@@ -127,7 +139,9 @@ export default function StatsClient({
                     >
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-bold text-white">{longestSession.name}</p>
+                                <p className="text-sm font-bold text-white">
+                                    {locale === "es" && longestSession.name_es ? longestSession.name_es : longestSession.name}
+                                </p>
                                 <p className="text-xs text-white/35 mt-0.5">
                                     {formatDate(longestSession.startedAt, locale)} · {longestSession.durationFormatted}
                                 </p>
@@ -139,35 +153,68 @@ export default function StatsClient({
             )}
 
             {/* Recent sessions */}
-            {hasCompletedSessions && (
+            {hasAnySessions && (
                 <div className="px-5">
                     <p className="text-xs text-white/30 uppercase tracking-widest mb-3">
                         {t("stats.recentSessions")}
                     </p>
                     <div className="space-y-2">
-                        {recentSessions.map((w) => (
+                        {recentSessions.map((w) => {
+                            const colors = w.status === "active" && w.colorIdx >= 0
+                                ? SESSION_COLORS[w.colorIdx] ?? SESSION_COLORS[0]
+                                : null;
+                            return (
                             <Link
                                 key={w.id}
                                 href={`/session/${w.id}`}
                                 className="flex items-center justify-between px-4 py-3 rounded-xl transition-all hover:bg-white/5"
-                                style={{ border: "1px solid rgba(255,255,255,0.05)", background: "#0a0a0a" }}
+                                style={{
+                                    border: colors
+                                        ? `1.5px solid ${colors.border}`
+                                        : "1px solid rgba(255,255,255,0.05)",
+                                    background: colors ? colors.bg : "#0a0a0a",
+                                }}
                             >
                                 <div>
-                                    <p className="text-sm font-semibold text-white">{w.name}</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm font-semibold text-white truncate max-w-[180px]">
+                                            {locale === "es" && w.name_es ? w.name_es : w.name}
+                                        </p>
+                                        {w.status === "active" && (
+                                            <span
+                                                className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-md flex items-center gap-1"
+                                                style={{ background: `${(colors?.accent ?? "#39ff14")}20`, color: colors?.accent ?? "#39ff14" }}
+                                            >
+                                                <span
+                                                    className="w-1.5 h-1.5 rounded-full animate-pulse"
+                                                    style={{ background: colors?.accent ?? "#39ff14" }}
+                                                />
+                                                {t("log.active")}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="text-xs text-white/30 mt-0.5">{formatDate(w.startedAt, locale)}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-bold text-white tabular-nums">
-                                        {w.durationFormatted}
-                                    </p>
-                                    {w.difficulty != null && (
+                                    {w.status === "completed" && (
+                                        <p className="text-sm font-bold text-white tabular-nums">
+                                            {w.durationFormatted}
+                                        </p>
+                                    )}
+                                    {w.status === "completed" && w.difficulty != null && (
                                         <p className="text-xs text-white/30 mt-0.5">
                                             RPE {w.difficulty}
                                         </p>
                                     )}
+                                    {w.status === "active" && (
+                                        <p className="text-xs font-medium" style={{ color: colors?.accent ?? "#39ff14" }}>
+                                            {t("home.resume")} →
+                                        </p>
+                                    )}
                                 </div>
                             </Link>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}

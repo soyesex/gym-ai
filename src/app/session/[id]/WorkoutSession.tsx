@@ -18,6 +18,7 @@
  */
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ArrowLeft, Plus, Trash2, Search, X,
@@ -90,12 +91,44 @@ function formatElapsed(seconds: number): string {
 
 export default function WorkoutSession({ workout, exercises }: WorkoutSessionProps) {
     const router = useRouter();
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
 
     // Hydrate local set list from server data
     const [sets, setSets] = useState<LocalSet[]>(
         () => workout.sets as unknown as LocalSet[]
     );
+
+    // ── Resilient Data Sync (Fixes memory loss on Back button) ──────────────
+    // 1. Force a background refresh on mount to invalidate client cache
+    useEffect(() => {
+        router.refresh();
+    }, [router]);
+
+    // 2. Safely merge fresh server data into local state
+    // This avoids wiping out optimistic sets or active typing (which caused BUG-02)
+    useEffect(() => {
+        setSets((prev) => {
+            const next = [...prev];
+            let changed = false;
+            
+            for (const serverSet of (workout.sets as unknown as LocalSet[])) {
+                const localIdx = next.findIndex((s) => s.id === serverSet.id);
+                if (localIdx === -1) {
+                    // New set from server
+                    next.push(serverSet);
+                    changed = true;
+                } else {
+                    const localSet = next[localIdx];
+                    // Only merge if the DB is un-synced AND we aren't waiting on a pending save
+                    if (!localSet.pending && (localSet.weight_kg !== serverSet.weight_kg || localSet.reps !== serverSet.reps)) {
+                        next[localIdx] = { ...localSet, weight_kg: serverSet.weight_kg, reps: serverSet.reps };
+                        changed = true;
+                    }
+                }
+            }
+            return changed ? next.sort((a,b) => a.set_order - b.set_order) : prev;
+        });
+    }, [workout.sets]);
 
     const [showPicker, setShowPicker] = useState(false);
     const [showFinish, setShowFinish] = useState(false);
@@ -103,10 +136,34 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
     const [difficulty, setDifficulty] = useState(7);
     const [searchQuery, setSearchQuery] = useState("");
     const [errorToast, setErrorToast] = useState<string | null>(null);
+    const [show90MinNotice, setShow90MinNotice] = useState(false);
+    const [dismissed90Min, setDismissed90Min] = useState(false);
+    const [showAutoSavedToast, setShowAutoSavedToast] = useState(false);
     const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const elapsed = useElapsedSeconds(workout.started_at);
     const grouped = groupSets(sets);
+
+    // ── Auto-save toast detection on load ──────────────────────────────────────
+    useEffect(() => {
+        // If the session is loaded, the user wasn't active, and the timer is > 4h
+        // but status is somehow still active (meaning the server job hasn't run yet
+        // or just did and we caught it midway), we show a toast.
+        // Actually, the server cron job handles the zombie sessions. 
+        // We just need to check if we were redirected back to the log/home and the session is gone,
+        // but here we are in an active session. If it's been > 4 hours, warn them it's about to be saved.
+        if (elapsed >= 14400 && !showAutoSavedToast) {
+            setShowAutoSavedToast(true);
+            setTimeout(() => setShowAutoSavedToast(false), 8000);
+        }
+    }, []); // Run once on mount
+
+    // ── 90 Minute Notifier ──────────────────────────────────────────────────
+    useEffect(() => {
+        if (elapsed >= 5400 && !dismissed90Min && !show90MinNotice) {
+            setShow90MinNotice(true);
+        }
+    }, [elapsed, dismissed90Min, show90MinNotice]);
 
     // ── Error toast helper ────────────────────────────────────────────────────
     const showError = useCallback((key: string) => {
@@ -276,10 +333,10 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
             <div className="px-5 pt-12 pb-4">
                 <div className="flex items-center justify-between mb-5">
                     <button
-                        onClick={() => router.push("/log")}
+                        onClick={() => router.back()}
                         className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
                     >
-                        <ArrowLeft className="w-3.5 h-3.5" /> {t("session.workouts")}
+                        <ArrowLeft className="w-3.5 h-3.5" /> {t("session.back")}
                     </button>
 
                     <button
@@ -293,7 +350,7 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
                 <div className="flex items-start justify-between">
                     <div>
                         <h1 className="text-xl font-bold text-white leading-tight">
-                            {workout.name}
+                            {locale === "es" && workout.name_es ? workout.name_es : workout.name}
                         </h1>
                         {/* Elapsed timer */}
                         <p
@@ -391,6 +448,77 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
                 onCancel={() => setShowFinish(false)}
                 onConfirm={handleFinish}
             />
+
+            {/* ── 90 Min Warning Modal ── */}
+            <AnimatePresence>
+                {show90MinNotice && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="w-full max-w-sm rounded-[32px] p-6 text-center shadow-2xl"
+                            style={{
+                                background: "rgba(30,30,30,0.85)",
+                                border: "1px solid rgba(255,255,255,0.1)",
+                                backdropFilter: "blur(24px)",
+                            }}
+                        >
+                            <h2 className="text-xl font-extrabold text-white mb-2">
+                                {t("session.softCheck90Title")}
+                            </h2>
+                            <p className="text-sm text-white/60 mb-6 leading-relaxed">
+                                {t("session.softCheck90Desc")}
+                            </p>
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={() => {
+                                        setShow90MinNotice(false);
+                                        setDismissed90Min(true);
+                                        setShowFinish(true);
+                                    }}
+                                    className="w-full py-4 rounded-2xl font-bold text-sm transition-all hover:brightness-110"
+                                    style={{ background: "#39ff14", color: "#000" }}
+                                >
+                                    {t("session.wrapUp")}
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setShow90MinNotice(false);
+                                        setDismissed90Min(true);
+                                    }}
+                                    className="w-full py-4 rounded-2xl font-bold text-sm bg-white/5 text-white transition-all hover:bg-white/10"
+                                >
+                                    {t("session.keepGoing")}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+
+                {/* Toast for auto-save / timeout */}
+                {showAutoSavedToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 50 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 50 }}
+                        className="fixed bottom-24 left-4 right-4 z-50 flex flex-col gap-1 px-5 py-4 rounded-2xl shadow-2xl"
+                        style={{
+                            background: "rgba(57,255,20,0.15)",
+                            border: "1px solid rgba(57,255,20,0.3)",
+                            backdropFilter: "blur(12px)",
+                            maxWidth: 440,
+                            margin: "0 auto",
+                        }}
+                    >
+                        <p className="text-sm font-bold text-white flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full" style={{ background: "#39ff14" }} />
+                            {t("session.autoSavedToast")}
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* ── Error Toast ── */}
             <AnimatePresence>
                 {errorToast && (
@@ -452,7 +580,12 @@ function ExerciseGroup({ group, onChange, onBlur, onDelete, onAddSet }: Exercise
                 <span style={{ color: "#39ff14" }}>
                     <ChevronDown className="w-4 h-4" />
                 </span>
-                <p className="text-sm font-bold text-white flex-1">{displayName}</p>
+                <Link 
+                    href={`/exercises/${group.exercise.id}`}
+                    className="text-sm font-bold text-white flex-1 hover:underline transition-colors"
+                >
+                    {displayName}
+                </Link>
                 <span
                     className="text-[10px] px-2 py-0.5 rounded-full"
                     style={{

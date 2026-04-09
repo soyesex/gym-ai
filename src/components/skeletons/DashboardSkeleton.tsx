@@ -3,6 +3,7 @@
  * Skeleton placeholder for the home dashboard.
  * Mimics: welcome header + stats cards + recommended module cards.
  */
+import LoadingStateMessage from "@/components/ui/LoadingStateMessage";
 
 export function DashboardSkeleton() {
     return (
@@ -82,6 +83,9 @@ export function DashboardSkeleton() {
                     </div>
                 ))}
             </div>
+
+            <LoadingStateMessage />
         </div>
     );
 }
+
