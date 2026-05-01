@@ -247,7 +247,7 @@ export default function LandingClient() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-[10px] tracking-[0.3em] text-white/30 uppercase">{t("landing.mockWelcome")}</p>
-                                <p className="text-lg font-bold" style={{ color: "#39ff14" }}>Darling</p>
+                                <p className="text-lg font-bold" style={{ color: "#39ff14" }}>Alex M.</p>
                             </div>
                             <span
                                 className="text-[10px] font-bold px-2.5 py-1 rounded-lg"
