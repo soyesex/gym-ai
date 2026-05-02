@@ -25,6 +25,11 @@ interface LocalizedExercise {
     description_es?: string | null;
 }
 
+interface LocalizedWorkout {
+    name: string;
+    name_es?: string | null;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 /**
@@ -56,4 +61,12 @@ export function getExerciseDescription(
 ): string | null {
     if (locale === "es" && exercise.description_es) return exercise.description_es;
     return exercise.description ?? null;
+}
+
+/**
+ * Returns the locale-appropriate workout name.
+ */
+export function getWorkoutName(workout: LocalizedWorkout, locale: Locale): string {
+    if (locale === "es" && workout.name_es) return workout.name_es;
+    return workout.name;
 }

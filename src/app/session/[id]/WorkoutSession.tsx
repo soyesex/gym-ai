@@ -28,7 +28,7 @@ import { addSet, updateSet, deleteSet, finishWorkout, cancelWorkoutSession } fro
 import BottomNav from "@/components/home/BottomNav";
 import type { WorkoutWithSets, SetWithExercise } from "@/lib/supabase/queries";
 import type { Tables } from "@/lib/supabase/database.types";
-import { useTranslation, getExerciseName } from "@/i18n";
+import { useTranslation, getExerciseName, getWorkoutName } from "@/i18n";
 
 type Exercise = Tables<"exercises">;
 
@@ -350,7 +350,7 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
                 <div className="flex items-start justify-between">
                     <div>
                         <h1 className="text-xl font-bold text-white leading-tight">
-                            {locale === "es" && workout.name_es ? workout.name_es : workout.name}
+                            {getWorkoutName(workout, locale)}
                         </h1>
                         {/* Elapsed timer */}
                         <p

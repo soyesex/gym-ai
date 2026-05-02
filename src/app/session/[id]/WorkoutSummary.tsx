@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Clock3, Zap } from "lucide-react";
 import BottomNav from "@/components/home/BottomNav";
 import type { WorkoutWithSets } from "@/lib/supabase/queries";
-import { useTranslation, type Locale } from "@/i18n";
+import { useTranslation, type Locale, getExerciseName, getWorkoutName } from "@/i18n";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 
 
@@ -44,7 +44,7 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
     for (const set of workout.sets) {
         const key = set.exercise_id;
         if (!groups.has(key)) {
-            groups.set(key, { name: set.exercises.name, sets: [] });
+            groups.set(key, { name: getExerciseName(set.exercises, locale), sets: [] });
         }
         groups.get(key)!.sets.push(set);
     }
@@ -73,7 +73,7 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                 </div>
 
                 <h1 className="text-2xl font-bold text-white mb-1">
-                    {locale === "es" && workout.name_es ? workout.name_es : workout.name}
+                    {getWorkoutName(workout, locale)}
                 </h1>
                 <p className="text-sm text-white/35">{formatDate(workout.started_at, locale)}</p>
 

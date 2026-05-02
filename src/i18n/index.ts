@@ -6,4 +6,4 @@
  *   import { I18nProvider, useTranslation, type Locale } from "@/i18n";
  */
 export { I18nProvider, useTranslation, type Locale } from "./I18nProvider";
-export { getExerciseName, getExerciseDescription } from "./i18n-helpers";
+export { getExerciseName, getExerciseDescription, getWorkoutName } from "./i18n-helpers";

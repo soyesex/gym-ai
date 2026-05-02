@@ -127,6 +127,13 @@ export default function OnboardingWizard({ authName }: OnboardingWizardProps) {
     function next() { setDirection(1); setStep((s) => s + 1); }
     function back() { setDirection(-1); setStep((s) => s - 1); }
 
+    const detectLanguage = (): 'en' | 'es' => {
+        if (typeof window === 'undefined') return 'es';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const lang = window.navigator.language || (window.navigator as any).userLanguage || 'es';
+        return lang.toLowerCase().startsWith('es') ? 'es' : 'en';
+    };
+
     async function finish() {
         setSaving(true);
         setError(null);
@@ -139,6 +146,7 @@ export default function OnboardingWizard({ authName }: OnboardingWizardProps) {
             height_cm: formData.height_cm > 0 ? formData.height_cm : null,
             days_per_week: formData.days_per_week,
             minutes_per_session: formData.minutes_per_session,
+            preferred_language: detectLanguage(),
         });
 
         if (!result.success) {

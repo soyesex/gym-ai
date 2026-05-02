@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { I18nProvider, type Locale } from "@/i18n";
 import { cookies } from "next/headers";
+import { getProfile } from "@/lib/supabase/queries";
 import { PWAProvider } from "@/components/pwa/PWAProvider";
 import { OfflineDetector } from "@/components/ui/OfflineDetector";
 import "./globals.css";
@@ -40,7 +41,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const locale = (cookieStore.get("gym-ai-locale")?.value ?? "es") as Locale;
+  const profile = await getProfile();
+  const dbLocale = profile?.preferred_language as Locale | undefined;
+  const cookieLocale = cookieStore.get("gym-ai-locale")?.value as Locale | undefined;
+  const locale = dbLocale ?? cookieLocale ?? "es";
 
   return (
     <html lang={locale} className="dark">

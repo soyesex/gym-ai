@@ -29,6 +29,7 @@ type OnboardingPayload = Pick<
     | "height_cm"
     | "days_per_week"
     | "minutes_per_session"
+    | "preferred_language"
 >;
 
 /**
