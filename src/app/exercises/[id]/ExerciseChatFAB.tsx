@@ -407,12 +407,12 @@ export default function ExerciseChatFAB({ exerciseId, exerciseName }: Props) {
                                     placeholder={t("exercise.chat.placeholder")}
                                     rows={1}
                                     disabled={isLoading}
-                                    className="flex-1 bg-transparent resize-none text-sm outline-none disabled:opacity-50"
+                                    className="flex-1 bg-transparent resize-none text-sm outline-none disabled:opacity-50 py-1.5"
                                     style={{
                                         color: "#f0f0f0",
                                         lineHeight: "1.5",
                                         maxHeight: 120,
-                                        minHeight: 24,
+                                        minHeight: 36,
                                         fontFamily: "inherit",
                                     }}
                                 />
@@ -431,6 +431,9 @@ export default function ExerciseChatFAB({ exerciseId, exerciseName }: Props) {
                                     />
                                 </button>
                             </div>
+                            <p className="text-center text-[10px] mt-2" style={{ color: "rgba(255,255,255,0.3)" }}>
+                                {locale === "es" ? "La IA puede cometer errores. Verifica con un profesional." : "AI can make mistakes. Consult a professional."}
+                            </p>
                         </div>
                     </div>
                 </>
@@ -449,6 +452,10 @@ export default function ExerciseChatFAB({ exerciseId, exerciseName }: Props) {
                 @keyframes typing-dot {
                     0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
                     40%           { opacity: 1;   transform: scale(1); }
+                }
+                @keyframes cursor-blink {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0; }
                 }
                 details > summary::-webkit-details-marker { display: none; }
             `}</style>
@@ -544,10 +551,10 @@ function MessageBubble({
                     {message.text}
                     {message.isStreaming && (
                         <span
-                            className="inline-block w-1 h-4 ml-0.5 align-middle rounded-sm"
+                            className="inline-block w-1.5 h-1.5 ml-1 mb-0.5 rounded-full"
                             style={{
-                                background: "#39ff14",
-                                animation: "fab-pulse 0.8s ease-in-out infinite",
+                                background: "rgba(57,255,20,0.6)",
+                                animation: "typing-dot 1s infinite alternate",
                             }}
                         />
                     )}

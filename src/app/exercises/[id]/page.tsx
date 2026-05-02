@@ -37,6 +37,7 @@ import es from "@/i18n/es.json";
 import LocaleToggle from "@/components/ui/LocaleToggle";
 import ExerciseChatFAB from "./ExerciseChatFAB";
 import BackButton from "@/components/ui/BackButton";
+import ScrollToTop from "@/components/ui/ScrollToTop";
 import type React from "react";
 
 // ---------------------------------------------------------------------------
@@ -228,6 +229,8 @@ export default async function ExerciseDetailPage({
             className="min-h-screen pb-28"
             style={{ background: "#000", maxWidth: "480px", margin: "0 auto" }}
         >
+            <ScrollToTop />
+            
             {/* ── Sticky Header ──────────────────────────────────────────────── */}
             <header
                 className="sticky top-0 z-50 flex items-center justify-between px-4 py-3"

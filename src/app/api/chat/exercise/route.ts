@@ -198,7 +198,8 @@ BEHAVIOR RULES:
 4. When suggesting rep ranges or weights, always account for the user's level.
 5. ${medicalDisclaimer}
 6. Never provide medical diagnoses. Always recommend professional consultation for injuries.
-7. If asked about exercise variations, suggest beginner/advanced alternatives when appropriate.`;
+7. If asked about exercise variations, suggest beginner/advanced alternatives when appropriate.
+8. DO NOT use markdown formatting. Use plain text only (no asterisks, no bold, no lists).`;
 }
 
 // ── Main handler ─────────────────────────────────────────────────────────────
@@ -322,7 +323,7 @@ export async function POST(request: Request) {
                     contents,
                     config: {
                         temperature: 0.7,
-                        maxOutputTokens: 512,
+                        maxOutputTokens: 2048,
                     },
                 });
 
