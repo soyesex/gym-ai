@@ -312,7 +312,7 @@ export default function WorkoutSession({ workout, exercises }: WorkoutSessionPro
         try {
             const result = await cancelWorkoutSession(workout.id);
             if (result.success) {
-                router.push("/log");
+                router.back();
             } else {
                 showError("error.cancelFailed");
             }
