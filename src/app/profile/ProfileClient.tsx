@@ -17,10 +17,11 @@
  */
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ArrowLeft, Check, ChevronRight, Loader2,
-    LogOut, User, Target, Dumbbell, Scale, Calendar, Globe,
+    LogOut, User, Target, Dumbbell, Scale, Calendar, Globe, History,
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 import { updateProfile, signOut } from "./actions";
@@ -172,6 +173,9 @@ export default function ProfileClient({ authEmail, profile }: ProfileClientProps
 
                 {/* Schedule */}
                 <ScheduleSection profile={profile} />
+
+                {/* Workout History */}
+                <WorkoutHistoryLink />
 
                 {/* Account / Logout */}
                 <div
@@ -725,5 +729,31 @@ function LanguageSection() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// ── Workout History Link ───────────────────────────────────────────────────────
+
+/**
+ * Navigation card that links to /log (Training History).
+ * Placed in the profile so users can access their workout history from here.
+ */
+function WorkoutHistoryLink() {
+    const { t } = useTranslation();
+
+    return (
+        <Link
+            href="/log"
+            className="flex items-center gap-3 rounded-2xl overflow-hidden px-4 py-4 transition-colors hover:bg-white/[0.02]"
+            style={{ border: "1px solid rgba(255,255,255,0.06)" }}
+        >
+            <span style={{ color: "#39ff14" }}>
+                <History className="w-4 h-4" />
+            </span>
+            <span className="text-xs font-bold tracking-widest uppercase text-white/50 flex-1">
+                {t("profile.workoutHistory")}
+            </span>
+            <ChevronRight className="w-4 h-4 text-white/25" />
+        </Link>
     );
 }

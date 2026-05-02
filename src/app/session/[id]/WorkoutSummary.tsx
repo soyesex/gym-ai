@@ -1,23 +1,22 @@
+"use client";
+
 /**
  * @file app/workouts/[id]/WorkoutSummary.tsx
  * Read-only summary displayed when a workout is completed.
  * Shows total duration, difficulty rating, and the logged sets grouped by exercise.
  *
- * This is a Server Component — locale comes via props from the parent page
- * which reads it from the `gym-ai-locale` cookie.
+ * Uses router.back() for the back button so the user returns to
+ * whichever page they navigated from (stats, dashboard, etc.)
+ * instead of always being sent to /log.
  */
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, Clock3, Zap } from "lucide-react";
 import BottomNav from "@/components/home/BottomNav";
 import type { WorkoutWithSets } from "@/lib/supabase/queries";
-import type { Locale } from "@/i18n";
-import en from "@/i18n/en.json";
-import es from "@/i18n/es.json";
+import { useTranslation, type Locale } from "@/i18n";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 
-function getDict(locale: Locale) {
-    return locale === "es" ? es : en;
-}
+
 
 function formatDuration(seconds: number): string {
     const h = Math.floor(seconds / 3600);
@@ -37,7 +36,8 @@ function formatDate(isoString: string | null, locale: Locale): string {
 }
 
 export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWithSets; locale: Locale }) {
-    const dict = getDict(locale);
+    const router = useRouter();
+    const { t } = useTranslation();
 
     // Group sets by exercise for display
     const groups = new Map<string, { name: string; sets: WorkoutWithSets["sets"] }>();
@@ -56,12 +56,12 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
         >
             {/* Header */}
             <div className="px-5 pt-12 pb-6">
-                <Link
-                    href="/log"
+                <button
+                    onClick={() => router.back()}
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 mb-6 transition-colors"
                 >
-                    <ArrowLeft className="w-3.5 h-3.5" /> {dict.summary.backToLog}
-                </Link>
+                    <ArrowLeft className="w-3.5 h-3.5" /> {t("session.back")}
+                </button>
 
                 {/* Completed badge */}
                 <div
@@ -69,7 +69,7 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                     style={{ background: "rgba(57,255,20,0.1)", color: "#39ff14", border: "1px solid rgba(57,255,20,0.2)" }}
                 >
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    {dict.summary.completed}
+                    {t("summary.completed")}
                 </div>
 
                 <h1 className="text-2xl font-bold text-white mb-1">
@@ -84,7 +84,7 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                             {formatDuration(workout.duration_seconds ?? 0)}
                         </p>
                         <p className="text-xs text-white/35 flex items-center gap-1 mt-0.5">
-                            <Clock3 className="w-3 h-3" /> {dict.summary.duration}
+                            <Clock3 className="w-3 h-3" /> {t("summary.duration")}
                         </p>
                     </div>
                     {workout.subjective_difficulty != null && (
@@ -94,13 +94,13 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
                                 <span className="text-sm text-white/30">/10</span>
                             </p>
                             <p className="text-xs text-white/35 flex items-center gap-1 mt-0.5">
-                                <Zap className="w-3 h-3" /> {dict.summary.difficulty}
+                                <Zap className="w-3 h-3" /> {t("summary.difficulty")}
                             </p>
                         </div>
                     )}
                     <div>
                         <p className="text-2xl font-bold text-white">{workout.sets.length}</p>
-                        <p className="text-xs text-white/35 mt-0.5">{dict.summary.totalSets}</p>
+                        <p className="text-xs text-white/35 mt-0.5">{t("summary.totalSets")}</p>
                     </div>
                 </div>
             </div>
@@ -122,9 +122,9 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
 
                         {/* Column header */}
                         <div className="grid grid-cols-3 gap-2 px-4 py-2">
-                            <p className="text-[10px] text-white/25 text-center">{dict.summary.set}</p>
-                            <p className="text-[10px] text-white/25 text-center">{dict.summary.kg}</p>
-                            <p className="text-[10px] text-white/25 text-center">{dict.summary.reps}</p>
+                            <p className="text-[10px] text-white/25 text-center">{t("summary.set")}</p>
+                            <p className="text-[10px] text-white/25 text-center">{t("summary.kg")}</p>
+                            <p className="text-[10px] text-white/25 text-center">{t("summary.reps")}</p>
                         </div>
 
                         {group.sets.map((set, i) => (
@@ -147,7 +147,7 @@ export default function WorkoutSummary({ workout, locale }: { workout: WorkoutWi
             </div>
 
             <div className="px-5">
-                <InstallPrompt dict={dict.pwa} />
+                <InstallPrompt dict={{ title: t("pwa.title"), iosDesc: t("pwa.iosDesc"), androidDesc: t("pwa.androidDesc"), installBtn: t("pwa.installBtn") }} />
             </div>
 
             <BottomNav />

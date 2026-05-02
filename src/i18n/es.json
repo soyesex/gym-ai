@@ -102,7 +102,8 @@
         "daysWeek": "Días / semana",
         "language": "Idioma",
         "noUsernameSet": "sin usuario",
-        "back": "Volver"
+        "back": "Volver",
+        "workoutHistory": "Historial de Entrenamientos"
     },
     "goals": {
         "lose_fat": "Perder Grasa",
