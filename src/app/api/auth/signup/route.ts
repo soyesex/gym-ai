@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Step 2: Sign up via Supabase ─────────────────────────────────
-    let supabaseResponse = NextResponse.json({});
+    const supabaseResponse = NextResponse.json({});
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
