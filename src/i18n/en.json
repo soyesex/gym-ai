@@ -139,7 +139,11 @@
         "personalBest": "Personal Best",
         "recentSessions": "Recent Sessions",
         "noSessionsYet": "No completed sessions yet.",
-        "startFirstWorkout": "Start First Workout"
+        "startFirstWorkout": "Start First Workout",
+        "sessionsPerWeek": "Sessions per Week",
+        "weeklyVolume": "Weekly Volume",
+        "sessionDuration": "Session Duration",
+        "noVolumeData": "Log workouts with weights to see volume trends"
     },
     "onboardingDesc": {
         "lose_fat": "Cut body fat, get lean",

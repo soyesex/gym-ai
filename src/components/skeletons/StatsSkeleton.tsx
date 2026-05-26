@@ -57,16 +57,22 @@ export function StatsSkeleton() {
                 </div>
             </div>
 
-            {/* Chart placeholder */}
-            <div className="px-5 mb-4">
-                <div
-                    className="h-48 w-full rounded-2xl"
-                    style={{
-                        background: "#0a0a0a",
-                        border: "1px solid rgba(255,255,255,0.06)",
-                    }}
-                />
-            </div>
+            {/* Chart placeholders (3 charts) */}
+            {[0, 1, 2].map((i) => (
+                <div key={i} className="px-5 mb-6">
+                    <div
+                        className="h-3 w-36 rounded mb-3"
+                        style={{ background: "rgba(255,255,255,0.05)" }}
+                    />
+                    <div
+                        className="h-44 w-full rounded-2xl"
+                        style={{
+                            background: "#0a0a0a",
+                            border: "1px solid rgba(255,255,255,0.06)",
+                        }}
+                    />
+                </div>
+            ))}
 
             {/* Recent sessions list */}
             <div className="px-5">

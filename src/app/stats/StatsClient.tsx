@@ -1,19 +1,13 @@
 "use client";
 
-/**
- * @file app/stats/StatsClient.tsx
- * Client Component for the Stats page — renders translated labels
- * using the i18n context.
- *
- * Data flow:
- *   Server page (page.tsx) fetches workouts and computes aggregates,
- *   then passes pre-computed props here for locale-aware rendering.
- */
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { BarChart2, Clock3, Zap, CheckCircle2, Flame, TrendingUp } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import BottomNav from "@/components/home/BottomNav";
 import { useTranslation } from "@/i18n";
+
+const StatsCharts = dynamic(() => import("./StatsCharts"), { ssr: false });
 
 // Icon map
 
@@ -41,6 +35,11 @@ interface StatCard {
     color: string;
 }
 
+// Chart data point types — exported for use in page.tsx
+export type WeeklySessionPoint = { week: string; count: number };
+export type WeeklyVolumePoint  = { week: string; volumeKg: number };
+export type DurationPoint      = { startedAt: string | null; minutes: number };
+
 export interface StatsClientProps {
     stats: StatCard[];
     longestSession: {
@@ -62,6 +61,9 @@ export interface StatsClientProps {
     }[];
     hasCompletedSessions: boolean;
     hasAnySessions: boolean;
+    weeklySessionsData: WeeklySessionPoint[];
+    weeklyVolumeData: WeeklyVolumePoint[];
+    sessionDurationData: DurationPoint[];
 }
 
 /** Color themes for dual active sessions */
@@ -89,6 +91,9 @@ export default function StatsClient({
     recentSessions,
     hasCompletedSessions,
     hasAnySessions,
+    weeklySessionsData,
+    weeklyVolumeData,
+    sessionDurationData,
 }: StatsClientProps) {
     const { t, locale } = useTranslation();
 
@@ -125,6 +130,15 @@ export default function StatsClient({
                     );
                 })}
             </div>
+
+            {/* Progress charts */}
+            {hasCompletedSessions && (
+                <StatsCharts
+                    weeklySessionsData={weeklySessionsData}
+                    weeklyVolumeData={weeklyVolumeData}
+                    sessionDurationData={sessionDurationData}
+                />
+            )}
 
             {/* Best session */}
             {longestSession && (

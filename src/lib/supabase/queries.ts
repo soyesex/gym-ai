@@ -245,6 +245,41 @@ export async function getWorkoutWithSets(
     return workout;
 }
 
+// ── Charts ────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetches summed volume (weight_kg × reps, warmup sets excluded) per workout ID.
+ * Used server-side to build the weekly volume chart in /stats.
+ * Returns an empty Map when workoutIds is empty (guards against an empty IN clause).
+ */
+export async function getChartVolumeData(
+    workoutIds: string[]
+): Promise<Map<string, number>> {
+    if (workoutIds.length === 0) return new Map();
+
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+        .from("workout_sets")
+        .select("workout_id, weight_kg, reps, is_warmup")
+        .in("workout_id", workoutIds)
+        .neq("is_warmup", true);
+
+    if (error) {
+        console.error("[getChartVolumeData] Supabase error:", error.message);
+        return new Map();
+    }
+
+    const volumeMap = new Map<string, number>();
+    for (const row of data ?? []) {
+        if (row.weight_kg == null || row.reps == null) continue;
+        const current = volumeMap.get(row.workout_id) ?? 0;
+        volumeMap.set(row.workout_id, current + row.weight_kg * row.reps);
+    }
+
+    return volumeMap;
+}
+
 // ── Exercise Detail ───────────────────────────────────────────────────────────
 
 /**

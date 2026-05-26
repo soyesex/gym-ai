@@ -139,7 +139,11 @@
         "personalBest": "Mejor Marca",
         "recentSessions": "Sesiones Recientes",
         "noSessionsYet": "Aún no tienes sesiones completadas.",
-        "startFirstWorkout": "Iniciar Primer Entrenamiento"
+        "startFirstWorkout": "Iniciar Primer Entrenamiento",
+        "sessionsPerWeek": "Sesiones por Semana",
+        "weeklyVolume": "Volumen Semanal",
+        "sessionDuration": "Duración de Sesiones",
+        "noVolumeData": "Registra entrenamientos con pesos para ver tu volumen"
     },
     "onboardingDesc": {
         "lose_fat": "Reducir grasa corporal, definir",
